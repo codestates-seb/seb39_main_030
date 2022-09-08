@@ -1,8 +1,8 @@
-#  위글위글
+#  작소인위🍻
 
 <div align="center">   
 <!--     <img src="" width="280px"/> -->
-    <h3>작소인위🍻</h3>
+    <h3>위글위글</h3>
 </div>
 
 ## 💻 배포 주소
@@ -16,6 +16,7 @@
 ## 👥 팀원 소개
 
 FE: [지영준](https://github.com/JiYJ725) [한상준](https://github.com/HANSANGJUN)
+
 BE: [강다교](https://github.com/kyodkyo) [최진아](https://github.com/jina0120)  
 
 
