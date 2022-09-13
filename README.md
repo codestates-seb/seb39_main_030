@@ -2,7 +2,7 @@
 
 <div align="center">   
 <!--     <img src="" width="280px"/> -->
-    <h3>위글위글</h3>
+    <h3>와글와글🗣</h3>
 </div>
 
 ## 💻 배포 주소
@@ -37,7 +37,7 @@ BE: [강다교](https://github.com/kyodkyo) [최진아](https://github.com/jina0
 ### 📂 프로젝트 관련 문서
 
 ```
-프로젝트 관련 문서를 노션에 정리해 
+프로젝트 관련 문서를 노션에 정리해 두었습니다
 ```
 
 [📑 프로젝트 기획서](https://scratched-skateboard-57f.notion.site/e9f42982388342228d551a148425f89b)
