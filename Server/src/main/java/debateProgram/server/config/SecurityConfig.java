@@ -4,7 +4,8 @@ import debateProgram.server.config.jwt.CustomAuthenticationEntryPoint;
 import debateProgram.server.config.jwt.JwtRequestFilter;
 import debateProgram.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.filters.CorsFilter;
+
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -51,6 +52,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint());
 
-        http.addFilterBefore(new JwtRequestFilter(userRepository), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }

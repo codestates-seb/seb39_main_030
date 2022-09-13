@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import debateProgram.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -21,11 +22,14 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String jwtHeader = request.getHeader(JwtProperties.HEADER_STRING);
+
+        //--------- 확인 후 지워야 하는 코드 --------
         System.out.println("JwtRequestFilter 진입");
 
         if(jwtHeader==null || !jwtHeader.startsWith(JwtProperties.TOKEN_PREFIX)){
