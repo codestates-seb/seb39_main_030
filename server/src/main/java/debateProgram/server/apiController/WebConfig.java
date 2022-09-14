@@ -17,7 +17,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://192.168.1.100:3000",
                         "http://pre-project-team30.s3-website.ap-northeast-2.amazonaws.com/"
                 )
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
         ;
 
     }
