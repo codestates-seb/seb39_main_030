@@ -33,14 +33,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
-                .and()
-                .httpBasic().disable()
-                .formLogin().disable()
-                .addFilter(corsFilter);
+        http.csrf().disable();
+//                .sessionManagement()
+//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//
+//                .and()
+//                .httpBasic().disable()
+//                .formLogin().disable()
+//                .addFilter(corsFilter);
 
         http.authorizeRequests()
                 .antMatchers(FRONT_URL + "/main/**")
