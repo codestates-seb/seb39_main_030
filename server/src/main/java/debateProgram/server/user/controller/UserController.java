@@ -33,7 +33,7 @@ public class UserController {
     }
 
 
-    @PatchMapping("/logout")
+    @GetMapping("/logout")
     public ResponseEntity userLogout(@RequestParam("userCode") int userCode) {
         User user = userService.findUser(userCode);
         String result = user.getUserState();
