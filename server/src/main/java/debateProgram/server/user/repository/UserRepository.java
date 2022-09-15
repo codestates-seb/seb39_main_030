@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
-    User findByKakaoEmail(String email);
+    User findByKakaoId(Long kakaoId);
 
     @Modifying
     @Transactional
