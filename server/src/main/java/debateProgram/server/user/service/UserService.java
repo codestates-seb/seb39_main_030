@@ -1,15 +1,13 @@
 package debateProgram.server.user.service;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import debateProgram.server.config.jwt.JwtProperties;
 import debateProgram.server.user.entity.User;
 import debateProgram.server.user.model.kakaoLoginDto.OauthToken;
 import debateProgram.server.user.model.oauth.KakaoProfile;
 import debateProgram.server.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,6 +23,7 @@ import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Component
 @AllArgsConstructor
@@ -96,7 +95,7 @@ public class UserService {
                     .nickname(profile.getKakao_account().getProfile().getNickname())
                     .kakaoEmail(profile.getKakao_account().getEmail())
                     .userRole("ROLE_USER")
-                    .userState(0)
+                    .userState("Y")
                     .build();
 
             userRepository.save(user);
@@ -104,7 +103,6 @@ public class UserService {
 
         return user;
     }
-//        return createToken(user);
 
 
     public KakaoProfile findProfile(String token) {
@@ -137,43 +135,13 @@ public class UserService {
     }
 
 
-    public String findUser(int userNum) {
-        Optional<User> user = userRepository.findById(userNum);
-        User findUser = user.orElseThrow(() -> new NoSuchElementException());
+    public User findUser(int userCode) {
+        userRepository.updateUserState(userCode);
 
-        if(findUser.getUserState()==1){
-            findUser.setUserState(0);
-        }
+        Optional<User> user = userRepository.findById(userCode);
+        User findUser = user.orElseThrow(()-> new RuntimeException("사용자를 찾을 수 없음"));
 
-        return "SUCCESS";
+        return findUser;
     }
-
-
-
-
-
-
-
-
-
-
-//    public String createToken(User user) {
-//        String jwtToken = JWT.create()
-//                .withSubject(user.getKakaoEmail())
-//                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
-//                .withClaim("id", user.getUserCode())
-//                .withClaim("nickname", user.getNickname())
-//                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
-//
-//        return jwtToken;
-//    }
-
-//    public User getUser(HttpServletRequest request) {
-//        Long userCode = (Long) request.getAttribute("userCode");
-//
-//        User user = userRepository.findByUserCode(userCode);
-//
-//        return user;
-//    }
 
 }

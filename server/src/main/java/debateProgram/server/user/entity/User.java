@@ -1,22 +1,19 @@
 package debateProgram.server.user.entity;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Data
 @Getter
+@Setter
 @Entity
 @Table(name="user")
 @NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userCode;
+    private int userCode;
 
     @Column
     private Long kakaoId;
@@ -34,14 +31,10 @@ public class User {
     private String userRole;
 
     @Column
-    private LocalDateTime createDate = LocalDateTime.now();
-
-    @Column
-    private int userState;
-    // (0:로그아웃, 1:로그인)
+    private String userState;
 
     @Builder
-    public User(Long kakaoId, String profileImg, String nickname, String kakaoEmail, String userRole, int userState) {
+    public User(Long kakaoId, String profileImg, String nickname, String kakaoEmail, String userRole, String userState) {
         this.kakaoId = kakaoId;
         this.profileImg = profileImg;
         this.nickname = nickname;

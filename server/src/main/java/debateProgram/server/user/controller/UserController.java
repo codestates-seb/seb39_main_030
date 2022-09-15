@@ -32,27 +32,14 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+
     @PatchMapping("/logout")
-    public ResponseEntity userLogout(@RequestParam("userNum") int userNum) {
-        String userState = userService.findUser(userNum);
+    public ResponseEntity userLogout(@RequestParam("userCode") int userCode) {
+        User user = userService.findUser(userCode);
+        String result = user.getUserState();
 
-        if(!userState.equals("SUCCESS")){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + token);
-//
-//        return ResponseEntity.ok().headers(headers).body("SUCCESS");
-
-//    @GetMapping("/me")
-//    public ResponseEntity getCurrentUser(HttpServletRequest request){
-//        User user = userService.getUser(request);
-//
-//        return new ResponseEntity<>(user, HttpStatus.OK);
-//    }
 
 }
