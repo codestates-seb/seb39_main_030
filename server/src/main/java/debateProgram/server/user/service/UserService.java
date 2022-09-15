@@ -47,7 +47,7 @@ public class UserService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", client_id);
-        params.add("redirect_uri", "http://localhost:3000");
+        params.add("redirect_uri", "http://localhost:3000/auth");
         params.add("code", code);
         params.add("client_secret", client_secret);
 
@@ -84,7 +84,7 @@ public class UserService {
 
         KakaoProfile profile = findProfile(token);
 
-        User user = userRepository.findByKakaoEmail(profile.getKakao_account().getEmail());
+        User user = userRepository.findByKakaoId(profile.getId());
 
         if (user == null) {
             user = User.builder()
