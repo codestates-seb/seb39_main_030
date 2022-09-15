@@ -6,8 +6,9 @@ import debateProgram.server.user.entity.User;
 import debateProgram.server.user.model.kakaoLoginDto.OauthToken;
 import debateProgram.server.user.model.oauth.KakaoProfile;
 import debateProgram.server.user.repository.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,22 +19,19 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
 @Service
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
 
-//    @Value("${KAKAO_Client_Id}")
-//    String client_id;
-//
-//    @Value("${KAKAO_Client_Secret}")
-//    String client_secret;
+    @Value("${KAKAO_Client_Id}")
+    private String client_id;
+
+    @Value("${KAKAO_Client_Secret}")
+    private String client_secret;
 
     private final UserRepository userRepository;
 
@@ -48,10 +46,10 @@ public class UserService {
         //HttpBody
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
-        params.add("client_id", "");
-        params.add("redirect_uri", "http://localhost:3000/auth");
+        params.add("client_id", client_id);
+        params.add("redirect_uri", "http://localhost:3000");
         params.add("code", code);
-        params.add("client_secret", "");
+        params.add("client_secret", client_secret);
 
         //HttpEntity (헤더와 바디를 담을 객체)
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
