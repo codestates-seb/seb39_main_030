@@ -15,18 +15,18 @@ import java.time.LocalDateTime;
 public class Guestbook {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int guestbook_code;
+    private int guestbookCode;
 
     @Column
-    private int user_code;
+    private int userCode;
 
     @Column
-    private int guest_code;
+    private int guestCode;
 
     @Column
-    private String comment_contents;
+    private String commentContents;
 
     @Column
-    private LocalDateTime comment_create_date = LocalDateTime.now();
+    private LocalDateTime commentCreateDate = LocalDateTime.now();
 
 }
