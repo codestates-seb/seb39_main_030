@@ -17,27 +17,27 @@ import java.time.LocalDateTime;
 public class Discussion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int discussion_code;
+    private int discussionCode;
 
     @Column
-    private int user_code;
+    private int userCode;
 
     @Column
-    private LocalDateTime discussion_create_date = LocalDateTime.now();
+    private LocalDateTime discussionCreateDate = LocalDateTime.now();
 
     @Column
-    private String discussion_title;
+    private String discussionTitle;
 
     @Column
-    private String discussion_contents;
+    private String discussionContents;
 
     @Column
-    private String discussion_category;
+    private String discussionCategory;
 
     @Column
-    private String discussion_tag;
+    private String discussionTag;
 
     @Column
-    private int discussion_likes;
+    private int discussionLikes;
 
 }
