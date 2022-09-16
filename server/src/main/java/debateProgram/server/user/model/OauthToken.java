@@ -1,4 +1,4 @@
-package debateProgram.server.user.model.kakaoLoginDto;
+package debateProgram.server.user.model;
 
 import lombok.Data;
 
