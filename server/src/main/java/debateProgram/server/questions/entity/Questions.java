@@ -14,23 +14,23 @@ import java.time.LocalDateTime;
 public class Questions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int question_code;
+    private int questionCode;
 
     @Column
-    private int user_code;
+    private int userCode;
 
     @Column
-    private LocalDateTime question_create_date = LocalDateTime.now();
+    private LocalDateTime questionCreateDate = LocalDateTime.now();
 
     @Column
-    private String question_title;
+    private String questionTitle;
 
     @Column
-    private String question_contents;
+    private String questionContents;
 
     @Column
-    private String question_answer;
+    private String questionAnswer;
 
     @Column
-    private String question_clear;
+    private String questionClear;
 }
