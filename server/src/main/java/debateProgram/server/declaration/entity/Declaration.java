@@ -14,23 +14,23 @@ import java.time.LocalDateTime;
 public class Declaration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int declaration_code;
+    private int declarationCode;
 
     @Column
-    private int discussion_code;
+    private int discussionCode;
 
     @Column
-    private int user_code;
+    private int userCode;
 
     @Column
-    private LocalDateTime declaration_create_date = LocalDateTime.now();
+    private LocalDateTime declarationCreateDate = LocalDateTime.now();
 
     @Column
-    private String declaration_reason;
+    private String declarationReason;
 
     @Column
-    private String declaration_answer;
+    private String declarationAnswer;
 
     @Column
-    private String declaration_clear;
+    private String declarationClear;
 }
