@@ -1,5 +1,7 @@
 package debateProgram.server.exception;
 
+import lombok.Getter;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,6 +17,7 @@ public enum ExceptionCode {
     COMMENT_NOT_FOUND(404, "Comment not found"),
     COMMENT_CODE_EXISTS(409, "Comment Code exists");
 
+
 //    ORDER_NOT_FOUND(404, "Order not found"),
 //    CANNOT_CHANGE_ORDER(403, "Order can not change"),
 //    NOT_IMPLEMENTATION(501, "Not Implementation"),
@@ -26,4 +29,10 @@ public enum ExceptionCode {
     @Getter
     private String message;
 
+    ExceptionCode(int code, String message) {
+        this.status = code;
+        this.message = message;
+    }
+
 }
+
