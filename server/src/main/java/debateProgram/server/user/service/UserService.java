@@ -2,9 +2,12 @@ package debateProgram.server.user.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import debateProgram.server.exception.BusinessLogicException;
+import debateProgram.server.exception.ExceptionCode;
 import debateProgram.server.user.entity.User;
-import debateProgram.server.user.model.kakaoLoginDto.OauthToken;
-import debateProgram.server.user.model.oauth.KakaoProfile;
+import debateProgram.server.user.model.OauthToken;
+import debateProgram.server.user.model.KakaoProfile;
+import debateProgram.server.user.model.UserRequestDto;
 import debateProgram.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +18,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -135,11 +139,19 @@ public class UserService {
 
     public User findUser(int userCode) {
         userRepository.updateUserState(userCode);
-
-        Optional<User> user = userRepository.findById(userCode);
-        User findUser = user.orElseThrow(()-> new RuntimeException("사용자를 찾을 수 없음"));
+        User findUser = findVerifiedUser(userCode);
 
         return findUser;
     }
 
+
+    @Transactional(readOnly = true)
+    public User findVerifiedUser(int userCode) {
+        Optional<User> optionalMember = userRepository.findById(userCode);
+
+        User findUser = optionalMember.orElseThrow(
+                () -> new BusinessLogicException(ExceptionCode.USER_NOT_FOUND));
+
+        return findUser;
+    }
 }
