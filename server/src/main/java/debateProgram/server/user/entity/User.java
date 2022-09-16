@@ -16,22 +16,26 @@ public class User {
     private int userCode;
 
     @Column
-    private Long kakaoId;
+    private String userState;
 
     @Column
-    private String profileImg;
+    private Long kakaoId;
 
     @Column
     private String nickname;
 
     @Column
+    private String profileImg;
+
+    @Column
     private String kakaoEmail;
+
+    @Column
+    private int userLikes;
 
     @Column
     private String userRole;
 
-    @Column
-    private String userState;
 
     @Builder
     public User(Long kakaoId, String profileImg, String nickname, String kakaoEmail, String userRole, String userState) {
