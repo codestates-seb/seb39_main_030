@@ -2,50 +2,62 @@ import axios, { AxiosResponse } from 'axios';
 
 import { User } from '../type';
 import { axiosInstance } from '../axiosInstance';
-import useUser from './useUser';
+import { useNavigate } from 'react-router-dom';
+import { clearStoredUser, setStoredUser } from './user-storage';
+import { useDispatch } from 'react-redux';
+import { userActions } from '../store/user-slice';
+import { toast } from 'react-toastify';
+import { basicToastOption } from '../components/app/Layout';
 
 interface UseAuth {
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (code: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
-  signOut: () => void;
+  signOut: (code: string) => void;
 }
 
-type UserResponse = { user: User };
-type ErrorResponse = { message: string };
-type AuthResponseType = UserResponse | ErrorResponse;
+type Logout = 'N';
+type UserResponse = User;
+type AuthResponseType = UserResponse | Logout;
 
 export function useAuth(): UseAuth {
   const SERVER_ERROR = 'There was an error contacting the server.';
-  const { clearUser, updateUser } = useUser();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  async function authServerCall(
-    urlEndpoint: string,
-    email: string,
-    password: string
-  ): Promise<void> {
+  async function authServerCall(urlEndpoint: string): Promise<void> {
     try {
       const { data, status }: AxiosResponse<AuthResponseType> =
-        await axiosInstance({
-          url: urlEndpoint,
-          method: 'POST',
-          data: { email, password },
-          headers: { 'Content-Type': 'application/json' },
-        });
+        await axiosInstance.get(urlEndpoint);
 
-      if (status === 400) {
-        const title = 'message' in data ? data.message : 'Unauthorized';
-        // toast({ title, status: 'warning' });
+      if (data === 'N') {
+        clearStoredUser();
+        dispatch(userActions.change());
+        toast.info('로그아웃이 완료되었습니다.', {
+          position: 'top-center',
+          ...basicToastOption,
+        });
+        navigate('/');
         return;
       }
 
-      if ('user' in data && 'token' in data.user) {
-        // toast({
-        //   title: `Logged in as ${data.user.email}`,
-        //   status: 'info',
-        // });
+      if (status === 400) {
+        toast.warn('잘못된 요청입니다.', {
+          position: 'top-center',
+          ...basicToastOption,
+        });
+        navigate('/');
+        return;
+      }
 
-        // update stored user data
-        updateUser(data.user);
+      if (data) {
+        toast.info(`${data.nickname}님, 환영합니다 😘`, {
+          position: 'top-center',
+          ...basicToastOption,
+        });
+
+        setStoredUser(data);
+        dispatch(userActions.change());
+        navigate('/');
       }
     } catch (errorResponse) {
       const title =
@@ -53,27 +65,26 @@ export function useAuth(): UseAuth {
         (errorResponse.response.data as any).message
           ? (errorResponse.response.data as any).message
           : SERVER_ERROR;
-      // toast({
-      //   title,
-      //   status: 'error',
-      // });
+      toast.error(title, {
+        position: 'top-center',
+        ...basicToastOption,
+      });
+      navigate('/');
     }
   }
 
-  async function signIn(email: string, password: string): Promise<void> {
-    authServerCall('/signin', email, password);
+  async function signIn(code: string): Promise<void> {
+    // authServerCall(`/user/oauth/token?code=${code}`); 실데이터
+    authServerCall(`/user/oauth/token`);
   }
-  async function signUp(email: string, password: string): Promise<void> {
-    authServerCall('/user', email, password);
+  async function signUp(): Promise<void> {
+    authServerCall('/user');
   }
 
-  function signOut(): void {
+  function signOut(code: string): void {
     // clear user from stored user data
-    clearUser();
-    // toast({
-    //   title: 'Logged out!',
-    //   status: 'info',
-    // });
+    // authServerCall(`/user/logout?userCode=${code}`); 실데이터
+    authServerCall(`/user/logout`);
   }
 
   // Return the user object and auth methods

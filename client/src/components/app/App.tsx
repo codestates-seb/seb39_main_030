@@ -9,13 +9,16 @@ import Layout from './Layout';
 
 import RouteList from './RouteList';
 import { ThemeProvider } from 'styled-components';
+import ModalPortal from '../block/Modal/ModalPortal';
 
-function App() {
+const App = () => {
   const theme = useCustomTheme();
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyled />
       <QueryClientProvider client={queryClient}>
+        <ModalPortal />
         <Layout>
           <RouteList />
         </Layout>
@@ -23,6 +26,6 @@ function App() {
       </QueryClientProvider>
     </ThemeProvider>
   );
-}
+};
 
 export default App;

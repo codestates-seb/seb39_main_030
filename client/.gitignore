@@ -17,7 +17,7 @@
 .env.development.local
 .env.test.local
 .env.production.local
-.env
+.env.production
 .idea
 
 npm-debug.log*

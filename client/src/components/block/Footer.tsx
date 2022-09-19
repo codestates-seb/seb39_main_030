@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { Text } from '../atom/Text';
+import { media } from '../../style/media';
 
 const Footer = () => {
   return (
@@ -21,6 +22,9 @@ const StyledFooter = styled.footer`
   margin-top: auto;
   background: ${({ theme }) => theme.mode.background};
   padding: 10px 5rem;
+  ${media.custom('768px')} {
+    padding: 10px 1rem;
+  }
 
   .content {
     width: 96%;
