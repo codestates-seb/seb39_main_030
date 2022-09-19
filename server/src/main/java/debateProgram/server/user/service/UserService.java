@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
 import debateProgram.server.user.entity.User;
-import debateProgram.server.user.model.OauthToken;
 import debateProgram.server.user.model.KakaoProfile;
-import debateProgram.server.user.model.UserRequestDto;
+import debateProgram.server.user.model.OauthToken;
+import debateProgram.server.user.model.UserUpdateRequestDto;
 import debateProgram.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -101,6 +101,8 @@ public class UserService {
                     .build();
 
             userRepository.save(user);
+        } else {
+            userRepository.updateUserState(user.getUserCode(), "Y");
         }
 
         return user;
@@ -137,8 +139,8 @@ public class UserService {
     }
 
 
-    public User findUser(int userCode) {
-        userRepository.updateUserState(userCode);
+    public User logoutUser(int userCode) {
+        userRepository.updateUserState(userCode, "N");
         User findUser = findVerifiedUser(userCode);
 
         return findUser;
@@ -154,4 +156,54 @@ public class UserService {
 
         return findUser;
     }
+
+
+    public User updateUserInfo(UserUpdateRequestDto dto) {
+        userRepository.updateInfo(dto.getUserCode(), dto.getNickname(), dto.getProfileImg(), dto.getKakaoEmail());
+        User findUser = findVerifiedUser(dto.getUserCode());
+
+        return findUser;
+    }
+
+
+    public User discussionStateUpdate(int userCode, String state) {
+        userRepository.updateLiveState(userCode, state);
+        User findUser = findVerifiedUser(userCode);
+
+        return findUser;
+    }
+
+
+    @Transactional
+    public int userLikesUpdate(int userCode, int identifier) {
+        User user = findVerifiedUser(userCode);
+        int likes = user.getUserLikes();
+
+        if (identifier==1) {
+            likes = likes + 1;
+            userRepository.updateUserLikes(userCode, likes);
+        }
+        else if (identifier==0) {
+            likes = likes - 1;
+            userRepository.updateUserLikes(userCode, likes);
+        }
+
+        return likes;
+    }
+
+
+    public String verifyEmailAndDelete(int userCode, String email) {
+        User user = findVerifiedUser(userCode);
+        String result = "";
+
+        if(user.getKakaoEmail().equals(email)){
+            userRepository.delete(user);
+            result = "SUCCESS";
+        } else {
+            result = "FAIL";
+        }
+
+        return result;
+    }
+
 }

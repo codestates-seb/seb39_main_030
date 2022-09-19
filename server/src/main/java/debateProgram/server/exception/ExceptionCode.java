@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
 public enum ExceptionCode {
 
     USER_NOT_FOUND(404, "User not found"),

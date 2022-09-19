@@ -19,6 +19,9 @@ public class User {
     private String userState;
 
     @Column
+    private String discussionState;
+
+    @Column
     private Long kakaoId;
 
     @Column
