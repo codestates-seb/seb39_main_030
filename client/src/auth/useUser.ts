@@ -3,14 +3,13 @@ import { useQuery, useQueryClient } from 'react-query';
 import type { User } from '../type';
 import { axiosInstance, getJWTHeader } from '../axiosInstance';
 import { queryKeys } from '../react-query/constants';
-import { clearStoredUser, getStoredUser, setStoredUser } from './user-storage';
 
 async function getUser(
   user: User | null,
   signal: AbortSignal
 ): Promise<User | null> {
   if (!user) return null;
-  const { data } = await axiosInstance.get(`/user/${user.id}`, {
+  const { data } = await axiosInstance.get(`/user/${user.userCode}`, {
     headers: getJWTHeader(user),
     signal,
   });
@@ -26,19 +25,8 @@ interface UseUser {
 const useUser = (): UseUser => {
   const queryClient = useQueryClient();
   // TODO: call useQuery to update user data from server
-  const { data: user } = useQuery(
-    queryKeys.user,
-    ({ signal }) => getUser(user, signal),
-    {
-      initialData: getStoredUser(),
-      onSuccess: (received: User | null) => {
-        if (!received) {
-          clearStoredUser();
-        } else {
-          setStoredUser(received);
-        }
-      },
-    }
+  const { data: user } = useQuery(queryKeys.user, ({ signal }) =>
+    getUser(user, signal)
   );
 
   // meant to be called from useAuth

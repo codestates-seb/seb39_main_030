@@ -2,14 +2,14 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useRef } from 'react';
 import { hamburgerMenuActions } from '../../store/uiSlice/hamburgerMenu-slice';
+import { RootState } from '../../store';
 
 const HamburgerMenu = () => {
   const dispatch = useDispatch();
   const HamburgerMenuRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    HamburgerMenuRef.current!.checked = false;
-  }, [close]);
+  const hamburgerMenuChecked = useSelector(
+    (state: RootState) => state.hamburgerMenu.checked
+  );
 
   const changeState = () => {
     dispatch(hamburgerMenuActions.change(HamburgerMenuRef.current!.checked));
@@ -19,9 +19,11 @@ const HamburgerMenu = () => {
     <StyledHamburgerMenu>
       <input
         type="checkbox"
+        checked={hamburgerMenuChecked}
         id="trigger"
         onClick={changeState}
         ref={HamburgerMenuRef}
+        readOnly
       />
       <label htmlFor="trigger">
         <span></span>

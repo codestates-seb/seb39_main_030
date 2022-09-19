@@ -13,7 +13,6 @@ const RouteList = () => {
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/" element={<Lending />}></Route>
-        <Route path="/login" element={<Login />}></Route>
         <Route path="/auth" element={<Oauth />}></Route>
         <Route path="/add-debate" element={<AddDebatePage />}></Route>
       </Routes>
