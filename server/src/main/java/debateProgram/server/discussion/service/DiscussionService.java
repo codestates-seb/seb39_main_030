@@ -1,6 +1,7 @@
 package debateProgram.server.discussion.service;
 
 import debateProgram.server.discussion.entity.Discussion;
+import debateProgram.server.discussion.model.UpdateRequestDiscussionDto;
 import debateProgram.server.discussion.repository.DiscussionRepository;
 import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -61,5 +63,40 @@ public class DiscussionService {
     public void deleteDiscussion(int discussionCode) {
         Discussion findDiscussion = findDiscussionDetails(discussionCode);
         discussionRepository.delete(findDiscussion);
+    }
+
+    public Discussion updateDiscussion(UpdateRequestDiscussionDto updateRequestDiscussionDto) {
+        discussionRepository.updateDiscussion(
+                updateRequestDiscussionDto.getDiscussionTitle(),
+                updateRequestDiscussionDto.getDiscussionContents(),
+                updateRequestDiscussionDto.getDiscussionCategory(),
+                updateRequestDiscussionDto.getDiscussionTag(),
+                updateRequestDiscussionDto.getDiscussionCode()
+        );
+        Discussion discussion = findDiscussionDetails(updateRequestDiscussionDto.getDiscussionCode());
+
+        return discussion;
+    }
+
+    /**
+     * 토론 게시글 좋아요 API
+     * @param discussionCode
+     * @param identifier
+     * @return
+     */
+    @Transactional
+    public int updateDiscussionLikes(int discussionCode, int identifier) {
+        Discussion discussion = findDiscussionDetails(discussionCode);
+        int likes = discussion.getDiscussionLikes();
+
+        if (identifier == 1) {
+            likes = likes + 1;
+            discussionRepository.updateDiscussionLikes(discussionCode, likes);
+        } else if (identifier == 0) {
+            likes = likes - 1;
+            discussionRepository.updateDiscussionLikes(discussionCode, likes);
+        }
+
+        return likes;
     }
 }
