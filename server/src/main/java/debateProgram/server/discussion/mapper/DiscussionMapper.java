@@ -1,19 +1,16 @@
 package debateProgram.server.discussion.mapper;
 
 import debateProgram.server.discussion.entity.Discussion;
-import debateProgram.server.discussion.model.PostRequestDiscussionDto;
-import debateProgram.server.discussion.model.PostResponseDiscussionDto;
-import debateProgram.server.discussion.model.UpdateResponseDiscussionDto;
+import debateProgram.server.discussion.model.PostDiscussionRequestDto;
+import debateProgram.server.discussion.model.UpdateDiscussionResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface DiscussionMapper {
 
-    Discussion postRequestDiscussion(PostRequestDiscussionDto postRequestDiscussionDto);
+    Discussion postRequestToDiscussion(PostDiscussionRequestDto postDiscussionRequestDto);
 
-    PostResponseDiscussionDto postResponseDiscussionDto(Discussion discussion);
-
-    UpdateResponseDiscussionDto updateResponseDiscussionDto(Discussion discussion);
+    UpdateDiscussionResponseDto discussionToUpdateResponse(Discussion discussion);
 
 }

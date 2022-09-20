@@ -1,7 +1,7 @@
 package debateProgram.server.discussion.service;
 
 import debateProgram.server.discussion.entity.Discussion;
-import debateProgram.server.discussion.model.UpdateRequestDiscussionDto;
+import debateProgram.server.discussion.model.UpdateDiscussionRequestDto;
 import debateProgram.server.discussion.repository.DiscussionRepository;
 import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
@@ -28,7 +28,7 @@ public class DiscussionService {
      * @return
      */
     public Discussion findDiscussionDetails(int discussionCode) {
-        Optional<Discussion> optionalDiscussion = discussionRepository.findByDiscussionCode(discussionCode);
+        Optional<Discussion> optionalDiscussion = discussionRepository.findById(discussionCode);
 
         Discussion findDiscussion = optionalDiscussion.orElseThrow(() ->
                 new BusinessLogicException(ExceptionCode.POST_NOT_FOUND));
@@ -65,17 +65,17 @@ public class DiscussionService {
         discussionRepository.delete(findDiscussion);
     }
 
-    public Discussion updateDiscussion(UpdateRequestDiscussionDto updateRequestDiscussionDto) {
+    public Discussion updateDiscussion(Discussion discussion) {
         discussionRepository.updateDiscussion(
-                updateRequestDiscussionDto.getDiscussionTitle(),
-                updateRequestDiscussionDto.getDiscussionContents(),
-                updateRequestDiscussionDto.getDiscussionCategory(),
-                updateRequestDiscussionDto.getDiscussionTag(),
-                updateRequestDiscussionDto.getDiscussionCode()
+                discussion.getDiscussionTitle(),
+                discussion.getDiscussionContents(),
+                discussion.getDiscussionCategory(),
+                discussion.getDiscussionTag(),
+                discussion.getDiscussionCode()
         );
-        Discussion discussion = findDiscussionDetails(updateRequestDiscussionDto.getDiscussionCode());
+        Discussion result = findDiscussionDetails(discussion.getDiscussionCode());
 
-        return discussion;
+        return result;
     }
 
     /**

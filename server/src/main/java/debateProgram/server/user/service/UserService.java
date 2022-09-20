@@ -2,14 +2,12 @@ package debateProgram.server.user.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import debateProgram.server.discussion.entity.Discussion;
-import debateProgram.server.discussion.repository.DiscussionRepository;
 import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
 import debateProgram.server.user.entity.User;
 import debateProgram.server.user.model.KakaoProfile;
 import debateProgram.server.user.model.OauthToken;
-import debateProgram.server.user.model.UserUpdateRequestDto;
+import debateProgram.server.user.model.UpdateUserRequestDto;
 import debateProgram.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +23,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -161,7 +158,7 @@ public class UserService {
     }
 
 
-    public User updateUserInfo(UserUpdateRequestDto dto) {
+    public User updateUserInfo(UpdateUserRequestDto dto) {
         userRepository.updateInfo(dto.getUserCode(), dto.getNickname(), dto.getProfileImg(), dto.getKakaoEmail());
         User findUser = findVerifiedUser(dto.getUserCode());
 
@@ -169,7 +166,7 @@ public class UserService {
     }
 
 
-    public User discussionStateUpdate(int userCode, String state) {
+    public User updateDiscussionState(int userCode, String state) {
         userRepository.updateLiveState(userCode, state);
         User findUser = findVerifiedUser(userCode);
 
@@ -178,7 +175,7 @@ public class UserService {
 
 
     @Transactional
-    public int userLikesUpdate(int userCode, int identifier) {
+    public int updateUserLikes(int userCode, int identifier) {
         User user = findVerifiedUser(userCode);
         int likes = user.getUserLikes();
 
