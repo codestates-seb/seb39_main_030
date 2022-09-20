@@ -1,9 +1,8 @@
 package debateProgram.server.discussion.entity;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import debateProgram.server.user.entity.User;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,6 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+@ToString(exclude = "user")
 @Table(name="discussion")
 @NoArgsConstructor
 public class Discussion {
@@ -40,4 +40,8 @@ public class Discussion {
     @Column
     private int discussionLikes;
 
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name="userCode", insertable = false, updatable = false)
+    private User user;
 }
