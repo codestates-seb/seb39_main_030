@@ -1,7 +1,9 @@
 package debateProgram.server.discussion.entity;
 
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import debateProgram.server.user.entity.User;
+
 import lombok.*;
 
 import javax.persistence.*;
@@ -44,4 +46,5 @@ public class Discussion {
     @ManyToOne
     @JoinColumn(name="userCode", insertable = false, updatable = false)
     private User user;
+
 }

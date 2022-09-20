@@ -109,4 +109,14 @@ public class UserController {
     }
 
 
+    @GetMapping("/lists")
+    public ResponseEntity getAllList(@RequestParam("userCode") int userCode){
+        User user = userService.findVerifiedUser(userCode);
+
+    // 결과 dto 생성, Json 관련 어노테이션 삭제
+    // 문의글, 신고글, 댓글까지 나오게 연관관계 매핑
+
+        return new ResponseEntity(user, HttpStatus.OK);
+    }
+
 }
