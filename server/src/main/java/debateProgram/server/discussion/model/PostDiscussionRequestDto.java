@@ -1,21 +1,27 @@
 package debateProgram.server.discussion.model;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotBlank;
 
 @Getter
-@AllArgsConstructor
-public class UpdateResponseDiscussionDto {
+@Builder
+public class PostDiscussionRequestDto {
 
-    private int discussionCode;
+    @NotBlank
     private int userCode;
-    private LocalDateTime discussionCreateDate;
+
+    @NotBlank
     private String discussionTitle;
+
+    @NotBlank
     private String discussionContents;
+
+    @NotBlank
     private String discussionCategory;
+
+    @NotBlank
     private String discussionTag;
-    private int discussionLikes;
 
 }

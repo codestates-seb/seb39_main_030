@@ -8,31 +8,19 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Repository
 public interface DiscussionRepository extends JpaRepository<Discussion, Integer> {
-    Optional<Discussion> findByDiscussionCode(int discussionCode);
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE discussion SET " +
-            "discussion_title = :discussionTitle, " +
-            "discussion_contents = :discussionContents, " +
-            "discussion_category = :discussionCategory, " +
-            "discussion_tag = :discussionTag " +
-            "WHERE discussion_code = :discussionCode", nativeQuery = true)
-    void updateDiscussion(@Param("discussionTitle") String discussionTitle,
-                          @Param("discussionContents") String discussionContents,
-                          @Param("discussionCategory") String discussionCategory,
-                          @Param("discussionTag") String discussionTag,
-                          @Param("discussionCode") int discussionCode);
+    @Query(value = "UPDATE discussion SET discussion_title = :title, discussion_contents = :contents, " +
+            "discussion_category = :category, discussion_tag = :tag WHERE discussion_code = :code", nativeQuery = true)
+    void updateDiscussion(@Param("title") String title, @Param("contents") String contents, @Param("category") String category,
+                          @Param("tag") String tag, @Param("code") int code);
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE discussion SET " +
-            "discussion_likes = :likes " +
-            "WHERE discussion_code = :discussionCode", nativeQuery = true)
-    void updateDiscussionLikes(@Param("discussionCode") int discussionCode, @Param("likes") int likes);
+    @Query(value = "UPDATE discussion SET discussion_likes = :likes WHERE discussion_code = :code", nativeQuery = true)
+    void updateDiscussionLikes(@Param("code") int discussionCode, @Param("likes") int likes);
 
 }

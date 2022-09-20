@@ -3,17 +3,22 @@ package debateProgram.server.user.model;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.validation.constraints.NotBlank;
+
 @Getter
 @Builder
-public class UserResponseDto {
+public class UpdateUserRequestDto {
 
+    @NotBlank
     private int userCode;
-    private String discussionState;
-    private int kakaoId;
+
+    @NotBlank
     private String nickname;
+
+    @NotBlank
     private String profileImg;
+
+    @NotBlank
     private String kakaoEmail;
-    private String userLikes;
-    private String userRole;
 
 }
