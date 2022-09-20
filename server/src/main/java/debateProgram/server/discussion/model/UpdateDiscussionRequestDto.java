@@ -1,13 +1,16 @@
 package debateProgram.server.discussion.model;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
-@AllArgsConstructor
-public class PostRequestDiscussionDto {
+@Builder
+public class UpdateDiscussionRequestDto {
+
+    @NotBlank
+    private int discussionCode;
 
     @NotBlank
     private int userCode;
@@ -23,5 +26,4 @@ public class PostRequestDiscussionDto {
 
     @NotBlank
     private String discussionTag;
-
 }

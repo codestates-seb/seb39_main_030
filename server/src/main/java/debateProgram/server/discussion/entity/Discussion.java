@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @Table(name="discussion")
 @NoArgsConstructor
 public class Discussion {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int discussionCode;

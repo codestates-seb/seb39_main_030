@@ -10,13 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
+
     User findByKakaoId(Long kakaoId);
 
     @Modifying
     @Transactional
     @Query(value = "UPDATE user SET user_state = :state WHERE user_code = :userCode", nativeQuery = true)
     void updateUserState(@Param("userCode") int userCode, @Param("state") String state);
-
 
     @Modifying
     @Transactional
@@ -28,7 +28,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Transactional
     @Query(value = "UPDATE user SET discussion_state = :state WHERE user_code = :userCode", nativeQuery = true)
     void updateLiveState(@Param("userCode") int userCode, @Param("state") String state);
-
 
     @Modifying
     @Transactional
