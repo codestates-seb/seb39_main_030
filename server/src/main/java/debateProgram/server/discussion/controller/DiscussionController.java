@@ -4,6 +4,8 @@ import debateProgram.server.discussion.entity.Discussion;
 import debateProgram.server.discussion.mapper.DiscussionMapper;
 import debateProgram.server.discussion.model.PostRequestDiscussionDto;
 import debateProgram.server.discussion.model.PostResponseDiscussionDto;
+import debateProgram.server.discussion.model.UpdateRequestDiscussionDto;
+import debateProgram.server.discussion.model.UpdateResponseDiscussionDto;
 import debateProgram.server.discussion.service.DiscussionService;
 import debateProgram.server.dto.MultiResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -72,22 +74,69 @@ public class DiscussionController {
         Discussion discussion = discussionMapper.postRequestDiscussion(postRequestDiscussionDto);
         Discussion newDiscussion = discussionService.createDiscussion(discussion);
 
-        PostResponseDiscussionDto result = discussionMapper.postResponseDiscussionDto(newDiscussion);
+        PostResponseDiscussionDto response = discussionMapper.postResponseDiscussionDto(newDiscussion);
 
-        return new ResponseEntity<>(result, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     /**
      * 토론 게시글 삭제 API
      * @param discussionCode
+     * @param watcher
      * @return
      */
     @DeleteMapping("/delete/{discussion-code}")
-    public ResponseEntity deleteDiscussion(@PathVariable("discussion-code") int discussionCode) {
+    public ResponseEntity deleteDiscussion(@PathVariable("discussion-code") int discussionCode,
+                                           @RequestParam("watcher") int watcher) {
+        int userCode = discussionService.findDiscussionDetails(discussionCode).getUserCode();
 
-        discussionService.deleteDiscussion(discussionCode);
+        if (userCode == watcher) {
+            discussionService.deleteDiscussion(discussionCode);
 
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+
+        } else {
+            String result = "삭제 불가";
+            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+        }
     }
 
+    @PostMapping("/update/{discussion-code}")
+    public ResponseEntity updateDiscussion(@PathVariable("discussion-code") int discussionCode,
+                                           @RequestParam("watcher") int watcher,
+                                           @RequestBody UpdateRequestDiscussionDto updateRequestDiscussionDto
+                                           ) {
+        int userCode = discussionService.findDiscussionDetails(discussionCode).getUserCode();
+
+        if (userCode == watcher) {
+            Discussion discussion = discussionService.updateDiscussion(updateRequestDiscussionDto);
+            UpdateResponseDiscussionDto response = discussionMapper.updateResponseDiscussionDto(discussion);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            String result = "수정 불가";
+            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+        }
+    }
+
+    /**
+     * 토론 게시글 좋아요 API
+     * @param discussionCode
+     * @param identifier
+     * @param pressedPerson
+     * @return
+     */
+    @PostMapping("/likes/{discussion-code}")
+    public ResponseEntity updateDiscussionLikes(@PathVariable("discussion-code") int discussionCode,
+                                                @RequestParam("identifier") int identifier,
+                                                @RequestParam("pressedPerson") int pressedPerson) {
+        int userCode = discussionService.findDiscussionDetails(discussionCode).getUserCode();
+
+        if (userCode == pressedPerson) {
+            String result = "본인의 좋아요는 증감 불가";
+            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+        } else {
+            int response = discussionService.updateDiscussionLikes(discussionCode, identifier);
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+    }
 }
