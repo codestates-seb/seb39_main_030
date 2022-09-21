@@ -12,6 +12,7 @@ interface IWrapper {
 const DarkModeButton = () => {
   const dispatch = useDispatch();
   const mode = useSelector((state: RootState) => state.darkMode.mode) as string;
+
   const toggleTheme = () => {
     if (mode === 'light') {
       window.localStorage.setItem('theme', 'dark');

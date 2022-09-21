@@ -8,6 +8,7 @@ import { TbSearch } from 'react-icons/tb';
 import { MdOutlineClose } from 'react-icons/md';
 import { SearchMenuActions } from '../../store/uiSlice/SearchMenu-slice';
 import useOutSideClick from '../app/hooks/useOutSideClick';
+import { urlAction } from '../../store/url-slice';
 
 const SearchBar = () => {
   const searchRef = useRef();
@@ -30,8 +31,9 @@ const SearchBar = () => {
 
   const afterSearch = () => {
     if (!text) return;
+    dispatch(urlAction.setSearchSignal());
     dispatch(SearchMenuActions.close());
-    navigate(`/debate/${text}`);
+    navigate(`/${text}`);
     setText('');
     document.getElementById('search')!.blur();
   };
