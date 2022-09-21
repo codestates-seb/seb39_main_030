@@ -8,11 +8,10 @@ import { Overlay } from '../block/Modal/Modal';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import SearchBar from '../block/SearchBar';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const basicToastOption = {
-  autoClose: 3000,
+  autoClose: 2000,
   hideProgressBar: false,
   closeOnClick: true,
   pauseOnHover: true,
@@ -21,7 +20,6 @@ export const basicToastOption = {
 };
 
 const Layout = (props: { children: React.ReactNode }) => {
-  const mode = useSelector((state: RootState) => state.darkMode.mode) as string;
   const showSideMenu = useSelector(
     (state: RootState) => state.hamburgerMenu.checked
   );
@@ -32,18 +30,6 @@ const Layout = (props: { children: React.ReactNode }) => {
 
   return (
     <StyledLayout>
-      <ToastContainer
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme={mode === 'light' ? 'light' : 'dark'}
-      />
       <Header />
       <SideMenu />
       <SearchBar />
@@ -62,7 +48,6 @@ const StyledLayout = styled.div`
 
   main {
     min-height: calc(100vh - 9rem);
-    display: flex;
   }
 `;
 
