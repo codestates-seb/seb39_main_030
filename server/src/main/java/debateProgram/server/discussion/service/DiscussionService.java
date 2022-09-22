@@ -1,7 +1,8 @@
 package debateProgram.server.discussion.service;
 
 import debateProgram.server.discussion.entity.Discussion;
-import debateProgram.server.discussion.model.UpdateDiscussionRequestDto;
+import debateProgram.server.discussion.model.DetailDiscussionResponseDto;
+import debateProgram.server.discussion.model.UserDetailDto;
 import debateProgram.server.discussion.repository.DiscussionRepository;
 import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
@@ -24,8 +25,6 @@ public class DiscussionService {
 
     /**
      * 토론 게시글 상세
-     * @param discussionCode
-     * @return
      */
     public Discussion findDiscussionDetails(int discussionCode) {
         Optional<Discussion> optionalDiscussion = discussionRepository.findById(discussionCode);
@@ -36,12 +35,28 @@ public class DiscussionService {
         return findDiscussion;
     }
 
+    public DetailDiscussionResponseDto findDiscussionWithUser(int discussionCode){
+        Discussion d = findDiscussionDetails(discussionCode);
+        UserDetailDto userInfo = discussionRepository.findUserInfo(discussionCode);
+
+        DetailDiscussionResponseDto dto = DetailDiscussionResponseDto.builder()
+                .discussionCode(d.getDiscussionCode())
+                .userCode(d.getUserCode())
+                .createTime(d.getDiscussionCreateDate())
+                .title(d.getDiscussionTitle())
+                .contents(d.getDiscussionContents())
+                .category(d.getDiscussionCategory())
+                .tag(d.getDiscussionTag())
+                .likes(d.getDiscussionLikes())
+                .userInfo(userInfo)
+                .build();
+
+        return dto;
+    }
+
     /**
      * 토론 게시글 page, size에 맞춰 호출 API (무한 스크롤)
-     * DiscussionCode는 게시글 첫 작성을 기준으로 증가하는 column. DiscussionCode를 기준으로 DESC 정렬.
-     * @param page
-     * @param size
-     * @return
+     * DiscussionCode를 기준으로 DESC 정렬.
      */
     public Page<Discussion> findAllDiscussions(int page, int size) {
         return discussionRepository.findAll(PageRequest.of(page, size, Sort.by("discussionCode").descending()));
@@ -49,8 +64,6 @@ public class DiscussionService {
 
     /**
      * 토론 게시글 생성
-     * @param discussion
-     * @return
      */
     public Discussion createDiscussion(Discussion discussion) {
         return discussionRepository.save(discussion);
@@ -58,7 +71,6 @@ public class DiscussionService {
 
     /**
      * 토론 게시글 삭제
-     * @param discussionCode
      */
     public void deleteDiscussion(int discussionCode) {
         Discussion findDiscussion = findDiscussionDetails(discussionCode);
@@ -79,10 +91,7 @@ public class DiscussionService {
     }
 
     /**
-     * 토론 게시글 좋아요 API
-     * @param discussionCode
-     * @param identifier
-     * @return
+     * 토론 게시글 좋아요
      */
     @Transactional
     public int updateDiscussionLikes(int discussionCode, int identifier) {
