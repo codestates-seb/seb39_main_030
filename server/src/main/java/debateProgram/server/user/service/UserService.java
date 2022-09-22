@@ -2,12 +2,15 @@ package debateProgram.server.user.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import debateProgram.server.discussion.repository.DiscussionRepository;
 import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
 import debateProgram.server.user.entity.User;
-import debateProgram.server.user.model.KakaoProfile;
-import debateProgram.server.user.model.OauthToken;
-import debateProgram.server.user.model.UpdateUserRequestDto;
+import debateProgram.server.user.model.*;
+import debateProgram.server.user.model.AllListsInterface.CommentsDto;
+import debateProgram.server.user.model.AllListsInterface.DeclarationsDto;
+import debateProgram.server.user.model.AllListsInterface.DiscussionsDto;
+import debateProgram.server.user.model.AllListsInterface.QuestionsDto;
 import debateProgram.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +26,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -38,6 +42,9 @@ public class UserService {
     private String client_secret;
 
     private final UserRepository userRepository;
+
+    private final DiscussionRepository discussionRepository;
+
 
     public OauthToken getAccessToken(String code) {
 
@@ -179,11 +186,10 @@ public class UserService {
         User user = findVerifiedUser(userCode);
         int likes = user.getUserLikes();
 
-        if (identifier==1) {
+        if (identifier == 1) {
             likes = likes + 1;
             userRepository.updateUserLikes(userCode, likes);
-        }
-        else if (identifier==0) {
+        } else if (identifier == 0) {
             likes = likes - 1;
             userRepository.updateUserLikes(userCode, likes);
         }
@@ -196,7 +202,7 @@ public class UserService {
         User user = findVerifiedUser(userCode);
         String result = "";
 
-        if(user.getKakaoEmail().equals(email)){
+        if (user.getKakaoEmail().equals(email)) {
             userRepository.delete(user);
             result = "SUCCESS";
         } else {
@@ -206,4 +212,31 @@ public class UserService {
         return result;
     }
 
+
+    public AllListsResponseDto findAllLists(int userCode) {
+        User user = findVerifiedUser(userCode);
+
+        List<DiscussionsDto> discussionList = userRepository.findAllDiscussions(userCode);
+        List<CommentsDto> commentList = userRepository.findAllComments(userCode);
+        List<QuestionsDto> questionList = userRepository.findAllQuestions(userCode);
+        List<DeclarationsDto> declarationList = userRepository.findAllDeclarations(userCode);
+
+        AllListsResponseDto dto = AllListsResponseDto.builder()
+                .userCode(user.getUserCode())
+                .nickname(user.getNickname())
+                .profileImg(user.getProfileImg())
+                .discussionLists(discussionList)
+                .commentLists(commentList)
+                .questionLists(questionList)
+                .declarationLists(declarationList)
+                .build();
+
+        return dto;
+    }
+
+    public User registerSocketId(int userCode, String socketId) {
+        userRepository.updateSocketId(userCode, socketId);
+        User user = findVerifiedUser(userCode);
+        return user;
+    }
 }

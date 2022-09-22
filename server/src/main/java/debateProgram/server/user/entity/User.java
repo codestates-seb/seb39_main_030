@@ -1,18 +1,13 @@
 package debateProgram.server.user.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import debateProgram.server.discussion.entity.Discussion;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Getter
 @Setter
 @Entity
-@ToString(exclude = "discussions")
 @Table(name="user")
 @NoArgsConstructor
 public class User {
@@ -45,6 +40,9 @@ public class User {
     @Column
     private String userRole;
 
+    @Column
+    private String socketId;
+
     @Builder
     public User(Long kakaoId, String profileImg, String nickname, String kakaoEmail, String userRole, String userState) {
         this.kakaoId = kakaoId;
@@ -54,9 +52,5 @@ public class User {
         this.userRole = userRole;
         this.userState = userState;
     }
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "userCode")
-    private List<Discussion> discussions = new ArrayList<>();
 
 }

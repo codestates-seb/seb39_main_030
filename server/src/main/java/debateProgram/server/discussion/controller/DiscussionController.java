@@ -4,6 +4,7 @@ import debateProgram.server.comments.entity.Comments;
 import debateProgram.server.comments.service.CommentsService;
 import debateProgram.server.discussion.entity.Discussion;
 import debateProgram.server.discussion.mapper.DiscussionMapper;
+import debateProgram.server.discussion.model.DetailDiscussionResponseDto;
 import debateProgram.server.discussion.model.PostDiscussionRequestDto;
 import debateProgram.server.discussion.model.UpdateDiscussionRequestDto;
 import debateProgram.server.discussion.model.UpdateDiscussionResponseDto;
@@ -17,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,15 +65,13 @@ public class DiscussionController {
      */
     @GetMapping("/detail/{discussion-code}")
     public ResponseEntity getDiscussionDetails(@PathVariable("discussion-code") int discussionCode) {
-        Discussion discussion = discussionService.findDiscussionDetails(discussionCode);
-
+        DetailDiscussionResponseDto result = discussionService.findDiscussionWithUser(discussionCode);
         List<Comments> comments = commentsService.findDiscussionComments(discussionCode);
 
-        List<Object> response = new ArrayList<>();
-        response.add(discussion);
-        response.add(comments);
+//        List<Object> response = new ArrayList<>();
+//        response.add(discussion);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     /**

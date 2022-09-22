@@ -2,16 +2,14 @@ package debateProgram.server.user.controller;
 
 import debateProgram.server.user.entity.User;
 import debateProgram.server.user.mapper.UserMapper;
-import debateProgram.server.user.model.OauthToken;
-import debateProgram.server.user.model.OtherUserResponseDto;
-import debateProgram.server.user.model.UpdateUserRequestDto;
-import debateProgram.server.user.model.UpdateUserResponseDto;
+import debateProgram.server.user.model.*;
 import debateProgram.server.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @Slf4j
 @RestController
@@ -49,6 +47,21 @@ public class UserController {
     }
 
     /**
+     * 사용자 삭제 API
+     */
+    @DeleteMapping
+    public ResponseEntity deleteUser(@RequestParam("userCode") int userCode,
+                                     @RequestParam("kakaoEmail") String email){
+        String result = userService.verifyEmailAndDelete(userCode, email);
+
+        if(result.equals("FAIL")){
+            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
+    }
+
+    /**
      * 마이페이지 조회 API
      */
     @GetMapping("/myInfo")
@@ -82,18 +95,13 @@ public class UserController {
     }
 
     /**
-     * 사용자 삭제 API
+     * 사용자가 작성한 전체 글 조회 API
      */
-    @DeleteMapping
-    public ResponseEntity deleteUser(@RequestParam("userCode") int userCode,
-                                     @RequestParam("kakaoEmail") String email){
-        String result = userService.verifyEmailAndDelete(userCode, email);
+    @GetMapping("/lists")
+    public ResponseEntity getAllList(@RequestParam("userCode") int userCode){
+        AllListsResponseDto result = userService.findAllLists(userCode);
 
-        if(result.equals("FAIL")){
-            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
-        }
-
-        return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
+        return new ResponseEntity(result, HttpStatus.OK);
     }
 
     /**
@@ -125,18 +133,18 @@ public class UserController {
         }
     }
 
-
     /**
-     * 사용자가 작성한 전체 글 조회 API
+     * 사용자 socketId 변경 API
      */
-    @GetMapping("/lists")
-    public ResponseEntity getAllList(@RequestParam("userCode") int userCode){
-        User user = userService.findVerifiedUser(userCode);
+    @PostMapping("/socket")
+    public ResponseEntity updateSocketId(@RequestParam("userCode") int userCode,
+                                         @RequestParam("socketId") String socketId){
+        User updatedUser = userService.registerSocketId(userCode, socketId);
+        SocketIdResponseDto result = userMapper.userToSocketResponse(updatedUser);
 
-    // 결과 dto 생성, Json 관련 어노테이션 삭제
-    // 문의글, 신고글, 댓글까지 나오게 연관관계 매핑
-
-        return new ResponseEntity(user, HttpStatus.OK);
+        return new ResponseEntity(result, HttpStatus.CREATED);
     }
+
+
 
 }

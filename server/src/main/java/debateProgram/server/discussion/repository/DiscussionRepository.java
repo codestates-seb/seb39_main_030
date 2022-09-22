@@ -2,6 +2,7 @@ package debateProgram.server.discussion.repository;
 
 import debateProgram.server.discussion.entity.Discussion;
 import debateProgram.server.discussion.model.UserDetailDto;
+import debateProgram.server.user.model.AllListsInterface.DiscussionsDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,5 +29,6 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Integer>
 
     @Query(value = "SELECT u.nickname Nickname, u.profile_img ProfileImg, u.user_state UserState " +
             "FROM discussion d JOIN user u ON d.user_code = u.user_code WHERE d.discussion_code = :code", nativeQuery = true)
-    List<UserDetailDto> findUserInfo(@Param("code") int discussionCode);
+    UserDetailDto findUserInfo(@Param("code") int discussionCode);
+
 }

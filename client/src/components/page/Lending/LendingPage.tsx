@@ -1,57 +1,35 @@
 import styled from 'styled-components';
 import React from 'react';
+import Item from '../../block/Carousel/Item';
+import TagTab from './TagTab/TagTab';
+import DebateList from './DebateList';
 import { Text } from '../../atom/Text';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { media } from '../../../style/media';
+import Toggle from '../../atom/Toggle';
+import { useDispatch } from 'react-redux';
+import { toggleActions } from '../../../store/debateToggle-slice';
 
 const LendingPage = () => {
+  const dispatch = useDispatch();
+  const toggleHandler = (state) => {
+    dispatch(toggleActions.setToggle(state));
+  };
   return (
     <StyledLendingPage>
-      <div className="contents">
-        <Text className="title" fontSize="xl" fontWeight="extraBold">
-          여기에 컨텐츠 내용이 들어갑니다.
-          <button
-            onClick={() => {
-              toast.success('🦄 Wow so easy!', {
-                position: 'top-center',
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-              });
-            }}
-          >
-            test
-          </button>
+      <SlickContainer>
+        <Item />
+      </SlickContainer>
+      <TagTab />
+      <div className="label">
+        <Text className="label-debate" fontSize="xl" fontWeight="semiBold">
+          토론 목록
         </Text>
-      </div>
-      <div className="contents">
-        <Text className="title" fontSize="xl" fontWeight="extraBold">
-          여기에 컨텐츠 내용이 들어갑니다.
+        <Text className="label-possible" fontSize="xl" fontWeight="semiBold">
+          바로 신청 가능한 토론만 보기
         </Text>
+        <Toggle className="toggle-possible" ToggleHandler={toggleHandler} />
       </div>
-      <div className="contents">
-        <Text className="title" fontSize="xl" fontWeight="extraBold">
-          여기에 컨텐츠 내용이 들어갑니다.
-        </Text>
-      </div>
-      <div className="contents">
-        <Text className="title" fontSize="xl" fontWeight="extraBold">
-          여기에 컨텐츠 내용이 들어갑니다.
-        </Text>
-      </div>
-      <div className="contents">
-        <Text className="title" fontSize="xl" fontWeight="extraBold">
-          여기에 컨텐츠 내용이 들어갑니다.
-        </Text>
-      </div>
-      <div className="contents">
-        <Text className="title" fontSize="xl" fontWeight="extraBold">
-          여기에 컨텐츠 내용이 들어갑니다.
-        </Text>
-      </div>
+      <DebateList />
     </StyledLendingPage>
   );
 };
@@ -60,9 +38,8 @@ export default LendingPage;
 
 const StyledLendingPage = styled.div`
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  padding: 20px;
+  flex-direction: column;
+  align-items: center;
 
   .contents {
     border: 1px solid ${({ theme }) => theme.mode.themeIcon};
@@ -71,5 +48,50 @@ const StyledLendingPage = styled.div`
     padding: 20px;
     margin: 2rem;
     border-radius: 20px;
+  }
+
+  .label {
+    margin-top: 5rem;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
+
+  .toggle-possible {
+    margin-right: 5rem;
+    ${media.custom('768px')} {
+      margin-right: 2rem;
+    }
+  }
+
+  .label-possible {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: 1rem;
+    ${media.custom('768px')} {
+      font-size: 17px;
+    }
+  }
+  .label-debate {
+    display: inline-block;
+    margin-left: 3rem;
+    ${media.custom('768px')} {
+      display: none;
+    }
+  }
+`;
+
+const SlickContainer = styled.section`
+  width: 100%;
+  .slick-dots {
+    .slick-active {
+      button::before {
+        color: ${({ theme }) => theme.mode.themeIcon};
+      }
+    }
+    button::before {
+      color: ${({ theme }) => theme.mode.themeIcon};
+    }
   }
 `;
