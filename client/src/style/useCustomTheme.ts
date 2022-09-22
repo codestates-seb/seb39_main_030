@@ -12,8 +12,8 @@ const dark = {
   background: '#1d1d1f',
   backgroundSub: '#575757',
   tableHeader: 'rgba(255,255,255,0.02)',
-  themeIcon: '#FBE302',
-  searchBar: 'rgba(251,227,2,0.8)',
+  themeIcon: '#FFD00F',
+  searchBar: 'rgba(255,208,15,0.7)',
   // button-color
   defaultButtonColor: '#ffffff',
   defaultButtonBackground: '#263970',

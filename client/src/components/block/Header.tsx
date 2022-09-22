@@ -141,7 +141,7 @@ const StyledHeader = styled.header<{
     position: absolute;
     top: 90%;
     right: 10px;
-    border: 2px solid ${({ theme }) => theme.mode.searchBar};
+    border: 2px solid ${({ theme }) => theme.mode.themeIcon};
     background-color: ${({ theme }) => theme.mode.mainBackground};
     border-radius: 5px;
     visibility: ${(props) => (props.userProfileOpen ? 'visible' : 'hidden')};

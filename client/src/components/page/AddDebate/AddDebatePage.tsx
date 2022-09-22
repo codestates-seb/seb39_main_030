@@ -1,5 +1,6 @@
 import useModal from '../../app/hooks/useModal';
 import React from 'react';
+import styled from 'styled-components';
 
 const AddDebatePage = () => {
   const { openModal } = useModal();
@@ -9,6 +10,7 @@ const AddDebatePage = () => {
   };
   return (
     <div>
+      <Container></Container>
       <button onClick={onClickButton}>click!!(Modal Test)</button>
       AddDebatePage
     </div>
@@ -16,3 +18,7 @@ const AddDebatePage = () => {
 };
 
 export default AddDebatePage;
+
+const Container = styled.div`
+  overflow: hidden;
+`;
