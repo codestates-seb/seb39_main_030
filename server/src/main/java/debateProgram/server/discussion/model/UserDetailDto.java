@@ -2,8 +2,9 @@ package debateProgram.server.discussion.model;
 
 public interface UserDetailDto {
 
-    int getNickName();
+    String getNickname();
     String getProfileImg();
     String getUserState();
+
 
 }
