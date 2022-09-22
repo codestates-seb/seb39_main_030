@@ -1,8 +1,10 @@
 package debateProgram.server.discussion.service;
 
 import debateProgram.server.discussion.entity.Discussion;
+
 import debateProgram.server.discussion.model.DetailDiscussionResponseDto;
 import debateProgram.server.discussion.model.UserDetailDto;
+
 import debateProgram.server.discussion.repository.DiscussionRepository;
 import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service

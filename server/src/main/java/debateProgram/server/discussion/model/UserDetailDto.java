@@ -6,5 +6,4 @@ public interface UserDetailDto {
     String getProfileImg();
     String getUserState();
 
-
 }

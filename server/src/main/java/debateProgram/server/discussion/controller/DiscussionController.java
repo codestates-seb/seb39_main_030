@@ -1,5 +1,7 @@
 package debateProgram.server.discussion.controller;
 
+import debateProgram.server.comments.entity.Comments;
+import debateProgram.server.comments.service.CommentsService;
 import debateProgram.server.discussion.entity.Discussion;
 import debateProgram.server.discussion.mapper.DiscussionMapper;
 import debateProgram.server.discussion.model.DetailDiscussionResponseDto;
@@ -33,6 +35,8 @@ public class DiscussionController {
 
     private final DiscussionMapper discussionMapper;
 
+    private final CommentsService commentsService;
+
     /**
      * 토론 게시글 생성 API
      */
@@ -62,6 +66,7 @@ public class DiscussionController {
     @GetMapping("/detail/{discussion-code}")
     public ResponseEntity getDiscussionDetails(@PathVariable("discussion-code") int discussionCode) {
         DetailDiscussionResponseDto result = discussionService.findDiscussionWithUser(discussionCode);
+        List<Comments> comments = commentsService.findDiscussionComments(discussionCode);
 
 //        List<Object> response = new ArrayList<>();
 //        response.add(discussion);

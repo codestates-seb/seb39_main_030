@@ -30,4 +30,5 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Integer>
     @Query(value = "SELECT u.nickname Nickname, u.profile_img ProfileImg, u.user_state UserState " +
             "FROM discussion d JOIN user u ON d.user_code = u.user_code WHERE d.discussion_code = :code", nativeQuery = true)
     UserDetailDto findUserInfo(@Param("code") int discussionCode);
+
 }

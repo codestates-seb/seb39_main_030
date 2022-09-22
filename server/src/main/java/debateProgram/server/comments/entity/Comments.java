@@ -29,7 +29,7 @@ public class Comments {
     private String commentContents;
 
     @Column
-    private LocalDateTime comment_create_date = LocalDateTime.now();
+    private LocalDateTime commentCreateDate = LocalDateTime.now();
 
 
 
