@@ -1,7 +1,6 @@
 package debateProgram.server.discussion.service;
 
 import debateProgram.server.discussion.entity.Discussion;
-import debateProgram.server.discussion.model.UpdateDiscussionRequestDto;
 import debateProgram.server.discussion.repository.DiscussionRepository;
 import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,8 +24,6 @@ public class DiscussionService {
 
     /**
      * 토론 게시글 상세
-     * @param discussionCode
-     * @return
      */
     public Discussion findDiscussionDetails(int discussionCode) {
         Optional<Discussion> optionalDiscussion = discussionRepository.findById(discussionCode);
@@ -39,9 +37,6 @@ public class DiscussionService {
     /**
      * 토론 게시글 page, size에 맞춰 호출 API (무한 스크롤)
      * DiscussionCode는 게시글 첫 작성을 기준으로 증가하는 column. DiscussionCode를 기준으로 DESC 정렬.
-     * @param page
-     * @param size
-     * @return
      */
     public Page<Discussion> findAllDiscussions(int page, int size) {
         return discussionRepository.findAll(PageRequest.of(page, size, Sort.by("discussionCode").descending()));
