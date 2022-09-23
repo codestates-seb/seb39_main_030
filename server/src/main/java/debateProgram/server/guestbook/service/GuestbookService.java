@@ -3,6 +3,7 @@ package debateProgram.server.guestbook.service;
 import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
 import debateProgram.server.guestbook.entity.Guestbook;
+import debateProgram.server.guestbook.model.UpdateGuestbookRequestDto;
 import debateProgram.server.guestbook.model.UserBookResponseDto;
 import debateProgram.server.guestbook.repository.GuestbookRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +41,11 @@ public class GuestbookService {
 
     public void deleteGuestbook(int bookCode) {
         guestbookRepository.deleteById(bookCode);
+    }
+
+    public void updateGuestbook(UpdateGuestbookRequestDto dto) {
+        String contents = dto.getGuestbookContents();
+        int code = dto.getGuestbookCode();
+        guestbookRepository.UpdateGuestbook(contents, code);
     }
 }
