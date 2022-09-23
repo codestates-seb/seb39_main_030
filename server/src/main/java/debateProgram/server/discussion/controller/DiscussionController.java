@@ -81,6 +81,9 @@ public class DiscussionController {
 
         if (userCode == viewerCode) {
             discussionService.deleteDiscussion(discussionCode);
+
+            List<Comments> commentsList = commentsService.findDiscussionComments(discussionCode);
+            commentsService.deleteComments(commentsList);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         else {
