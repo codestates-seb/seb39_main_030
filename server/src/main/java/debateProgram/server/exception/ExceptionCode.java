@@ -16,6 +16,9 @@ public enum ExceptionCode {
     QUESTION_NOT_FOUND(404, "Question not found"),
     QUESTION_CODE_EXISTS(409, "Question Code exists"),
 
+    DECLARATION_NOT_FOUND(404, "Declaration not found"),
+    DECLARATION_CODE_EXISTS(409, "Declaration Code exists"),
+
     GUESTBOOK_NOT_FOUND(404, "Guestbook not found"),
     GUESTBOOK_CODE_EXISTS(409, "Guestbook Code exists");
 

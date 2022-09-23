@@ -55,6 +55,16 @@ public class CommentsService {
     }
 
     /**
+     * 토론글 삭제 시 토론글에 달린 모든 댓글 삭제
+     */
+    public void deleteComments(List<Comments> commentsList) {
+        for (Comments comment : commentsList) {
+            Comments deleteComment = findCommentDetails(comment.getCommentCode());
+            commentsRepository.delete(deleteComment);
+        }
+    }
+
+    /**
      * 댓글 수정
      */
     public void updateComment(UpdateCommentRequestDto updateCommentRequestDto) {

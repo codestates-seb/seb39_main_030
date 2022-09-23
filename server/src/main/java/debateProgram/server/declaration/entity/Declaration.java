@@ -1,6 +1,7 @@
 package debateProgram.server.declaration.entity;
 
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name="declaration")
 @NoArgsConstructor
+@DynamicInsert
 public class Declaration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
