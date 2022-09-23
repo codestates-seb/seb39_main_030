@@ -13,4 +13,6 @@ public interface DiscussionMapper {
 
     UpdateDiscussionResponseDto discussionToUpdateResponse(Discussion discussion);
 
+
+
 }
