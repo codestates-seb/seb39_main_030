@@ -1,13 +1,13 @@
 package debateProgram.server.discussion.controller;
 
+import debateProgram.server.comments.entity.Comments;
+import debateProgram.server.comments.service.CommentsService;
 import debateProgram.server.discussion.entity.Discussion;
 import debateProgram.server.discussion.mapper.DiscussionMapper;
-import debateProgram.server.discussion.model.DetailDiscussionResponseDto;
-import debateProgram.server.discussion.model.PostDiscussionRequestDto;
-import debateProgram.server.discussion.model.UpdateDiscussionRequestDto;
-import debateProgram.server.discussion.model.UpdateDiscussionResponseDto;
+import debateProgram.server.discussion.model.*;
 import debateProgram.server.discussion.service.DiscussionService;
-import debateProgram.server.dto.MultiResponseDto;
+import debateProgram.server.user.entity.User;
+import debateProgram.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,6 +34,10 @@ public class DiscussionController {
 
     private final DiscussionMapper discussionMapper;
 
+    private final CommentsService commentsService;
+
+    private final UserService userService;
+
     /**
      * 토론 게시글 생성 API
      */
@@ -54,7 +58,29 @@ public class DiscussionController {
         Page<Discussion> pageDiscussions = discussionService.findAllDiscussions(page, size);
         List<Discussion> discussions = pageDiscussions.getContent();
 
-        return new ResponseEntity<>(new MultiResponseDto<>(discussions, pageDiscussions), HttpStatus.OK);
+        List<AllDiscussionsResponseDto> result = new ArrayList<>();
+
+        for(int i=0; i<discussions.size(); i++){
+            Discussion d = discussions.get(i);
+
+            AllDiscussionsResponseDto responseDto = AllDiscussionsResponseDto.builder()
+                    .discussionCode(d.getDiscussionCode())
+                    .createDate(d.getDiscussionCreateDate())
+                    .discussionTitle(d.getDiscussionTitle())
+                    .discussionContents(d.getDiscussionContents())
+                    .discussionCategory(d.getDiscussionCategory())
+                    .discussionTag(d.getDiscussionTag())
+                    .discussionLikes(d.getDiscussionLikes())
+                    .userCode(d.getUser().getUserCode())
+                    .userState(d.getUser().getUserState())
+                    .nickname(d.getUser().getNickname())
+                    .profileImg(d.getUser().getProfileImg())
+                    .build();
+
+            result.add(responseDto);
+        }
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     /**
@@ -63,10 +89,29 @@ public class DiscussionController {
     @GetMapping("/detail/{discussion-code}")
     public ResponseEntity getDiscussionDetails(@PathVariable("discussion-code") int discussionCode) {
         DetailDiscussionResponseDto result = discussionService.findDiscussionWithUser(discussionCode);
+        List<Comments> comments = commentsService.findDiscussionComments(discussionCode);
+
+        List<DetailCommentsResponseDto> commentsDto = new ArrayList<>();
+
+        for (int i=0; i<comments.size(); i++){
+            int userCode = comments.get(i).getUserCode();
+            User userInfo = userService.findVerifiedUser(userCode);
+            Comments commentInfo = comments.get(i);
+
+            DetailCommentsResponseDto dto = DetailCommentsResponseDto.builder()
+                    .userCode(userInfo.getUserCode())
+                    .nickname(userInfo.getUserState())
+                    .profileImg(userInfo.getProfileImg())
+                    .commentContents(commentInfo.getCommentContents())
+                    .commentCreateDate(commentInfo.getCommentCreateDate())
+                    .build();
+
+            commentsDto.add(dto);
+        }
 
         List<Object> response = new ArrayList<>();
         response.add(result);
-        response.add(comments);
+        response.add(commentsDto);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
