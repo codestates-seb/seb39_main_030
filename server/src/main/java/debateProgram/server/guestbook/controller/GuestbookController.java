@@ -2,6 +2,7 @@ package debateProgram.server.guestbook.controller;
 
 import debateProgram.server.guestbook.entity.Guestbook;
 import debateProgram.server.guestbook.mapper.GuestbookMapper;
+import debateProgram.server.guestbook.model.UpdateGuestbookRequestDto;
 import debateProgram.server.guestbook.model.UserBookResponseDto;
 import debateProgram.server.guestbook.model.WriteGuestbookRequestDto;
 import debateProgram.server.guestbook.service.GuestbookService;
@@ -63,5 +64,23 @@ public class GuestbookController {
         }
     }
 
+    /**
+     * 방명록 수정 API
+     */
+    @PostMapping("/update")
+    public ResponseEntity updateGuestbook(@RequestParam("viewerCode") int viewerCode,
+                                          @RequestBody UpdateGuestbookRequestDto dto) {
+        int userCode = guestbookService.findVerifiedGuestBook(dto.getGuestbookCode()).getGuestCode();
+
+        if (viewerCode == userCode) {
+            guestbookService.updateGuestbook(dto);
+            Guestbook result = guestbookService.findVerifiedGuestBook(dto.getGuestbookCode());
+
+            return new ResponseEntity<>(result, HttpStatus.CREATED);
+        } else {
+            String result = "작성자만 수정 가능";
+            return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
+        }
+    }
 
 }
