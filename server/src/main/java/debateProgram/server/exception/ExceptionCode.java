@@ -17,7 +17,10 @@ public enum ExceptionCode {
     COMMENT_CODE_EXISTS(409, "Comment Code exists"),
 
     QUESTION_NOT_FOUND(404, "Question not found"),
-    QUESTION_CODE_EXISTS(409, "Question Code exists");
+    QUESTION_CODE_EXISTS(409, "Question Code exists"),
+
+    DECLARATION_NOT_FOUND(404, "Declaration not found"),
+    DECLARATION_CODE_EXISTS(409, "Declaration Code exists");
 
 
 //    ORDER_NOT_FOUND(404, "Order not found"),
