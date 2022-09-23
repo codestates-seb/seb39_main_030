@@ -24,9 +24,9 @@ public class Guestbook {
     private int guestCode;
 
     @Column
-    private String commentContents;
+    private String guestbookContents;
 
     @Column
-    private LocalDateTime commentCreateDate = LocalDateTime.now();
+    private LocalDateTime guestbookCreateDate = LocalDateTime.now();
 
 }
