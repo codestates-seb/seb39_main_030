@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -68,10 +69,11 @@ public class DiscussionController {
         DetailDiscussionResponseDto result = discussionService.findDiscussionWithUser(discussionCode);
         List<Comments> comments = commentsService.findDiscussionComments(discussionCode);
 
-//        List<Object> response = new ArrayList<>();
-//        response.add(discussion);
+        List<Object> response = new ArrayList<>();
+        response.add(result);
+        response.add(comments);
 
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**

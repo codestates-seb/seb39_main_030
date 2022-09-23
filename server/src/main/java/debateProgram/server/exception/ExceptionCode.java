@@ -2,9 +2,6 @@ package debateProgram.server.exception;
 
 import lombok.Getter;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 public enum ExceptionCode {
 
     USER_NOT_FOUND(404, "User not found"),
@@ -17,7 +14,10 @@ public enum ExceptionCode {
     COMMENT_CODE_EXISTS(409, "Comment Code exists"),
 
     QUESTION_NOT_FOUND(404, "Question not found"),
-    QUESTION_CODE_EXISTS(409, "Question Code exists");
+    QUESTION_CODE_EXISTS(409, "Question Code exists"),
+
+    GUESTBOOK_NOT_FOUND(404, "Guestbook not found"),
+    GUESTBOOK_CODE_EXISTS(409, "Guestbook Code exists");
 
 
 //    ORDER_NOT_FOUND(404, "Order not found"),
