@@ -1,5 +1,6 @@
 package debateProgram.server.discussion.service;
 
+import debateProgram.server.comments.repository.CommentsRepository;
 import debateProgram.server.discussion.entity.Discussion;
 
 import debateProgram.server.discussion.model.DetailDiscussionResponseDto;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,10 +26,12 @@ public class DiscussionService {
 
     private final DiscussionRepository discussionRepository;
 
+    private final CommentsRepository commentsRepository;
+
     /**
-     * 토론 게시글 상세
+     * 토론글 상세
      */
-    public Discussion findDiscussionDetails(int discussionCode) {
+    public Discussion findVerifiedDiscussion(int discussionCode) {
         Optional<Discussion> optionalDiscussion = discussionRepository.findById(discussionCode);
 
         Discussion findDiscussion = optionalDiscussion.orElseThrow(() ->
@@ -39,7 +41,7 @@ public class DiscussionService {
     }
 
     public DetailDiscussionResponseDto findDiscussionWithUser(int discussionCode){
-        Discussion d = findDiscussionDetails(discussionCode);
+        Discussion d = findVerifiedDiscussion(discussionCode);
         UserDetailDto userInfo = discussionRepository.findUserInfo(discussionCode);
 
         DetailDiscussionResponseDto dto = DetailDiscussionResponseDto.builder()
@@ -58,25 +60,25 @@ public class DiscussionService {
     }
 
     /**
-     * 토론 게시글 page, size에 맞춰 호출 API (무한 스크롤)
-     * DiscussionCode를 기준으로 DESC 정렬.
+     * 토론글 전체 조회
      */
     public Page<Discussion> findAllDiscussions(int page, int size) {
         return discussionRepository.findAll(PageRequest.of(page, size, Sort.by("discussionCode").descending()));
     }
 
     /**
-     * 토론 게시글 생성
+     * 토론글 생성
      */
     public Discussion createDiscussion(Discussion discussion) {
         return discussionRepository.save(discussion);
     }
 
     /**
-     * 토론 게시글 삭제
+     * 토론글 삭제
      */
     public void deleteDiscussion(int discussionCode) {
-        Discussion findDiscussion = findDiscussionDetails(discussionCode);
+        Discussion findDiscussion = findVerifiedDiscussion(discussionCode);
+        commentsRepository.deleteAllByDiscussionCode(discussionCode);
         discussionRepository.delete(findDiscussion);
     }
 
@@ -88,17 +90,17 @@ public class DiscussionService {
                 discussion.getDiscussionTag(),
                 discussion.getDiscussionCode()
         );
-        Discussion result = findDiscussionDetails(discussion.getDiscussionCode());
+        Discussion result = findVerifiedDiscussion(discussion.getDiscussionCode());
 
         return result;
     }
 
     /**
-     * 토론 게시글 좋아요
+     * 토론글 좋아요
      */
     @Transactional
     public int updateDiscussionLikes(int discussionCode, int identifier) {
-        Discussion discussion = findDiscussionDetails(discussionCode);
+        Discussion discussion = findVerifiedDiscussion(discussionCode);
         int likes = discussion.getDiscussionLikes();
 
         if (identifier == 1) {

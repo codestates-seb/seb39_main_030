@@ -1,5 +1,6 @@
 package debateProgram.server.declaration.entity;
 
+import debateProgram.server.user.entity.User;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -35,4 +36,9 @@ public class Declaration {
 
     @Column
     private String declarationClear;
+
+    @ManyToOne
+    @JoinColumn(name="userCode", insertable = false, updatable = false)
+    private User user;
+
 }

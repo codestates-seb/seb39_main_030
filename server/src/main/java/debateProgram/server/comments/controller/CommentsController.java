@@ -32,7 +32,7 @@ public class CommentsController {
     /**
      * 댓글 생성 API
      */
-    @PostMapping("/{discussion-code}")
+    @PostMapping
     public ResponseEntity postComment(@RequestBody PostCommentsRequestDto requestDto) {
         Comments comments = commentsMapper.postRequestToComments(requestDto);
         Comments newComment = commentsService.creatComment(comments);
@@ -45,14 +45,13 @@ public class CommentsController {
     /**
      * 댓글 삭제 API
      */
-    @DeleteMapping("/delete/{comment-code}")
-    public ResponseEntity deleteComment(@PathVariable("comment-code") int commentCode,
+    @DeleteMapping("/delete")
+    public ResponseEntity deleteComment(@RequestParam("commentCode") int commentCode,
                                         @RequestParam("viewerCode") int viewerCode) {
-        int userCode = commentsService.findCommentDetails(commentCode).getUserCode();
+        int userCode = commentsService.findVerifiedComment(commentCode).getUserCode();
 
         if (userCode == viewerCode) {
             commentsService.deleteComment(commentCode);
-
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         else {
@@ -67,12 +66,12 @@ public class CommentsController {
     @PostMapping("/update")
     public ResponseEntity updateComment(@RequestParam("viewerCode") int viewerCode,
                                         @RequestBody UpdateCommentRequestDto requestDto) {
-        Comments commentDetails = commentsService.findCommentDetails(requestDto.getCommentCode());
+        Comments commentDetails = commentsService.findVerifiedComment(requestDto.getCommentCode());
         int userCode = commentDetails.getUserCode();
 
         if (userCode == viewerCode) {
             commentsService.updateComment(requestDto);
-            Comments result = commentsService.findCommentDetails(requestDto.getCommentCode());
+            Comments result = commentsService.findVerifiedComment(requestDto.getCommentCode());
             UpdateCommentResponseDto response = commentsMapper.commentToUpdateResponse(result);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         }
