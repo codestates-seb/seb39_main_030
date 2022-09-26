@@ -24,7 +24,7 @@ public class CommentsService {
     /**
      * 댓글 상세 조회
      */
-    public Comments findCommentDetails(int commentCode) {
+    public Comments findVerifiedComment(int commentCode) {
         Optional<Comments> optionalComments = commentsRepository.findById(commentCode);
 
         Comments comment = optionalComments.orElseThrow(
@@ -50,18 +50,8 @@ public class CommentsService {
      * 댓글 삭제
      */
     public void deleteComment(int commentCode) {
-        Comments comment = findCommentDetails(commentCode);
+        Comments comment = findVerifiedComment(commentCode);
         commentsRepository.delete(comment);
-    }
-
-    /**
-     * 토론글 삭제 시 토론글에 달린 모든 댓글 삭제
-     */
-    public void deleteComments(List<Comments> commentsList) {
-        for (Comments comment : commentsList) {
-            Comments deleteComment = findCommentDetails(comment.getCommentCode());
-            commentsRepository.delete(deleteComment);
-        }
     }
 
     /**

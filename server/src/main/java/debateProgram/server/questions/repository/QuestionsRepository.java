@@ -16,5 +16,7 @@ public interface QuestionsRepository extends JpaRepository<Questions, Integer> {
     @Query(value = "UPDATE questions SET question_answer = :answer, question_clear = 'Y' WHERE question_code = :code", nativeQuery = true)
     void registerReview(@Param("code") int questionCode, @Param("answer") String answer);
 
+    @Transactional
+    void deleteAllByUserCode(int userCode);
 
 }

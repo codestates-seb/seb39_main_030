@@ -4,9 +4,15 @@ import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
 import debateProgram.server.questions.entity.Questions;
 import debateProgram.server.questions.model.AdminReviewRequestDto;
+import debateProgram.server.questions.model.CreateQuestionResponseDto;
 import debateProgram.server.questions.repository.QuestionsRepository;
+import debateProgram.server.user.entity.User;
+import debateProgram.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +27,8 @@ public class QuestionsService {
 
     private final QuestionsRepository questionsRepository;
 
+    private final UserService userService;
+
     @Transactional(readOnly = true)
     public Questions findVerifiedQuestion(int questionCode) {
         Optional<Questions> optionalQuestions = questionsRepository.findById(questionCode);
@@ -31,8 +39,21 @@ public class QuestionsService {
         return question;
     }
 
-    public Questions createQuestion(Questions question) {
-        return questionsRepository.save(question);
+    @Transactional
+    public CreateQuestionResponseDto createQuestion(Questions question) {
+        Questions save = questionsRepository.save(question);
+        User user = userService.findVerifiedUser(save.getUserCode());
+
+        CreateQuestionResponseDto result = CreateQuestionResponseDto.builder()
+                .questionCode(save.getQuestionCode())
+                .questionTitle(save.getQuestionTitle())
+                .questionContents(save.getQuestionContents())
+                .userCode(save.getUserCode())
+                .nickname(user.getNickname())
+                .profileImg(user.getProfileImg())
+                .build();
+
+        return result;
     }
 
     public void deleteQuestion(Questions question) {
@@ -44,5 +65,9 @@ public class QuestionsService {
         String answer = requestDto.getAnswer();
         questionsRepository.registerReview(code, answer);
 
+    }
+
+    public Page<Questions> findAllQuestions(int page, int size) {
+        return questionsRepository.findAll(PageRequest.of(page, size, Sort.by("questionCode").descending()));
     }
 }

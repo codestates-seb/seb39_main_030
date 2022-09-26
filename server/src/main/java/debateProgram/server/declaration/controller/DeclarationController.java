@@ -2,16 +2,23 @@ package debateProgram.server.declaration.controller;
 
 import debateProgram.server.declaration.entity.Declaration;
 import debateProgram.server.declaration.mapper.DeclarationMapper;
-import debateProgram.server.declaration.model.AdminFeedbackRequestDto;
-import debateProgram.server.declaration.model.PostDeclarationRequestDto;
+import debateProgram.server.declaration.model.*;
 import debateProgram.server.declaration.service.DeclarationService;
+import debateProgram.server.dto.MultiResponseDto;
+import debateProgram.server.questions.entity.Questions;
+import debateProgram.server.questions.model.AllQuestionsResponseDto;
+import debateProgram.server.user.entity.User;
 import debateProgram.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -31,14 +38,17 @@ public class DeclarationController {
      */
     @GetMapping
     public ResponseEntity getDeclaration(@RequestParam("declarationCode") int declarationCode,
-                                         @RequestParam("viewerCode") int viewerCode) {
-        int userCode = declarationService.findVerifiedDeclaration(declarationCode).getUserCode();
-        String viewerRole = userService.findVerifiedUser(viewerCode).getUserRole();
+                                         @RequestParam("userCode") int userCode) {
+        int writerCode = declarationService.findVerifiedDeclaration(declarationCode).getUserCode();
+        String userRole = userService.findVerifiedUser(userCode).getUserRole();
 
-        if (userCode == viewerCode || viewerRole.equals("ROLE_ADMIN")) {
+        if (writerCode == userCode || userRole.equals("ROLE_ADMIN")) {
             Declaration declaration = declarationService.findVerifiedDeclaration(declarationCode);
+            User user = userService.findVerifiedUser(declaration.getUserCode());
 
-            return new ResponseEntity<>(declaration, HttpStatus.OK);
+            DetailDeclarationResponseDto result = new DetailDeclarationResponseDto(declaration, user);
+
+            return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
             String result = "본인의 신고글 또는 관리자만 조회 가능";
             return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
@@ -46,15 +56,41 @@ public class DeclarationController {
     }
 
     /**
+     * 신고글 전체 조회 API
+     */
+    @GetMapping("/all")
+    public ResponseEntity allQuestionInfo(@RequestParam("page") int page,
+                                          @RequestParam("size") int size){
+        Page<Declaration> pageDeclarations = declarationService.findAllDeclarations(page, size);
+        List<Declaration> declarations = pageDeclarations.getContent();
+
+        List<AllDeclarationResponseDto> result = new ArrayList<>();
+
+        for(int i=0; i<declarations.size(); i++){
+            Declaration d = declarations.get(i);
+
+            AllDeclarationResponseDto responseDto = AllDeclarationResponseDto.builder()
+                    .declarationCode(d.getDeclarationCode())
+                    .declarationReason(d.getDeclarationReason())
+                    .userCode(d.getUser().getUserCode())
+                    .nickname(d.getUser().getNickname())
+                    .profileImg(d.getUser().getProfileImg())
+                    .build();
+            result.add(responseDto);
+        }
+
+        return new ResponseEntity<>(new MultiResponseDto<>(result, pageDeclarations), HttpStatus.OK);
+    }
+
+    /**
      * 신고 게시글 생성 API
-     * null값이 N으로 들어가야 하는데 아직 구현X
      */
     @PostMapping
     public ResponseEntity postDeclaration(@RequestBody PostDeclarationRequestDto requestDto) {
         Declaration declaration = declarationMapper.postRequestToDeclaration(requestDto);
-        Declaration crateDeclaration = declarationService.crateDeclaration(declaration);
+        PostDeclarationResponseDto result = declarationService.crateDeclaration(declaration);
 
-        return new ResponseEntity<>(crateDeclaration, HttpStatus.CREATED);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     /**
@@ -62,12 +98,12 @@ public class DeclarationController {
      */
     @DeleteMapping
     public ResponseEntity deleteDeclaration(@RequestParam("declarationCode") int declarationCode,
-                                            @RequestParam("viewerCode") int viewerCode) {
+                                            @RequestParam("userCode") int userCode) {
         Declaration declaration = declarationService.findVerifiedDeclaration(declarationCode);
-        int userCode = declaration.getUserCode();
-        String viewerRole = userService.findVerifiedUser(viewerCode).getUserRole();
+        int writerCode = declaration.getUserCode();
+        String userRole = userService.findVerifiedUser(userCode).getUserRole();
 
-        if (userCode == viewerCode || viewerRole.equals("ROLE_ADMIN")) {
+        if (writerCode == userCode || userRole.equals("ROLE_ADMIN")) {
             declarationService.deleteDeclaration(declaration);
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }

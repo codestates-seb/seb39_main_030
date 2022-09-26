@@ -1,22 +1,26 @@
 package debateProgram.server.questions.controller;
 
+import debateProgram.server.dto.MultiResponseDto;
 import debateProgram.server.questions.entity.Questions;
 import debateProgram.server.questions.mapper.QuestionsMapper;
-import debateProgram.server.questions.model.AdminReviewRequestDto;
-import debateProgram.server.questions.model.CreateQuestionRequestDto;
+import debateProgram.server.questions.model.*;
 import debateProgram.server.questions.service.QuestionsService;
 import debateProgram.server.user.entity.User;
 import debateProgram.server.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping("/questions")
+@RequestMapping("/question")
 public class QuestionsController {
 
     private final QuestionsService questionsService;
@@ -32,9 +36,41 @@ public class QuestionsController {
     @GetMapping
     public ResponseEntity questionInfo(@RequestParam("questionCode") int questionCode) {
         Questions question = questionsService.findVerifiedQuestion(questionCode);
+        User user = userService.findVerifiedUser(question.getUserCode());
 
-        return new ResponseEntity<>(question, HttpStatus.OK);
+        DetailQuestionResponseDto result = new DetailQuestionResponseDto(question, user);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    /**
+     * 문의글 전체 조회 API
+     */
+    @GetMapping("/all")
+    public ResponseEntity allQuestionInfo(@RequestParam("page") int page,
+                                          @RequestParam("size") int size){
+        Page<Questions> pageQuestions = questionsService.findAllQuestions(page, size);
+        List<Questions> questions = pageQuestions.getContent();
+
+        List<AllQuestionsResponseDto> result = new ArrayList<>();
+
+        for(int i=0; i<questions.size(); i++){
+            Questions q = questions.get(i);
+
+            AllQuestionsResponseDto responseDto = AllQuestionsResponseDto.builder()
+                    .questionCode(q.getQuestionCode())
+                    .questionTitle(q.getQuestionTitle())
+                    .questionContents(q.getQuestionContents())
+                    .userCode(q.getUser().getUserCode())
+                    .nickname(q.getUser().getNickname())
+                    .profileImg(q.getUser().getProfileImg())
+                    .build();
+            result.add(responseDto);
+        }
+
+        return new ResponseEntity<>(new MultiResponseDto<>(result, pageQuestions), HttpStatus.OK);
+    }
+
 
     /**
      * 문의글 생성 API
@@ -42,9 +78,9 @@ public class QuestionsController {
     @PostMapping
     public ResponseEntity createQuestion(@RequestBody CreateQuestionRequestDto requestDto) {
         Questions question = questionsMapper.createRequestToQuestion(requestDto);
-        Questions savedQuestion = questionsService.createQuestion(question);
+        CreateQuestionResponseDto savedQ = questionsService.createQuestion(question);
 
-        return new ResponseEntity<>(savedQuestion, HttpStatus.CREATED);
+        return new ResponseEntity<>(savedQ, HttpStatus.CREATED);
     }
 
     /**

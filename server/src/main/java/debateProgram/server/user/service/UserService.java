@@ -2,9 +2,13 @@ package debateProgram.server.user.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import debateProgram.server.comments.repository.CommentsRepository;
+import debateProgram.server.declaration.repository.DeclarationRepository;
 import debateProgram.server.discussion.repository.DiscussionRepository;
 import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
+import debateProgram.server.guestbook.repository.GuestbookRepository;
+import debateProgram.server.questions.repository.QuestionsRepository;
 import debateProgram.server.user.entity.User;
 import debateProgram.server.user.model.*;
 import debateProgram.server.user.model.AllListsInterface.CommentsDto;
@@ -44,6 +48,14 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final DiscussionRepository discussionRepository;
+
+    private final CommentsRepository commentsRepository;
+
+    private final QuestionsRepository questionsRepository;
+
+    private final DeclarationRepository declarationRepository;
+
+    private final GuestbookRepository guestbookRepository;
 
 
     public OauthToken getAccessToken(String code) {
@@ -198,11 +210,16 @@ public class UserService {
     }
 
 
-    public String verifyEmailAndDelete(int userCode, String email) {
+    public String verifyEmailAndDeleteAll(int userCode, String email) {
         User user = findVerifiedUser(userCode);
         String result = "";
 
         if (user.getKakaoEmail().equals(email)) {
+            guestbookRepository.deleteAllByUserCode(user.getUserCode());
+            questionsRepository.deleteAllByUserCode(user.getUserCode());
+            declarationRepository.deleteAllByUserCode(user.getUserCode());
+            commentsRepository.deleteAllByUserCode(user.getUserCode());
+            discussionRepository.deleteAllByUserCode(user.getUserCode());
             userRepository.delete(user);
             result = "SUCCESS";
         } else {
