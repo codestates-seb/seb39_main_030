@@ -6,8 +6,9 @@ import modalSlice from './uiSlice/modal-slice';
 import userSlice from './user-slice';
 import tagSlice from './tag-slice';
 import urlSlice from './url-slice';
-import toggleSlice from './debateToggle-slice';
 import debateToggleSlice from './debateToggle-slice';
+import myPageSlice from './myPage';
+import socketSlice from './socket-slice';
 
 const store = configureStore({
   reducer: {
@@ -19,6 +20,8 @@ const store = configureStore({
     tag: tagSlice.reducer,
     url: urlSlice.reducer,
     debateToggle: debateToggleSlice.reducer,
+    myPage: myPageSlice.reducer,
+    socket: socketSlice.reducer,
   },
 });
 

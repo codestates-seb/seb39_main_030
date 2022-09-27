@@ -6,8 +6,18 @@ import { filterBySearchWord, filterTagByDebate } from './util';
 import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 
 const getDebateList = async (): Promise<Debate[]> => {
-  const { data } = await axiosInstance.get('/discussion');
-  return data;
+  if (
+    process.env.NODE_ENV === 'development' &&
+    process.env.REACT_APP_MOCK === '1'
+  ) {
+    const { data } = await axiosInstance.get('/discussion');
+    return data.data;
+  } else {
+    const { data } = await axiosInstance.get(
+      '/discussion?page=0&size=2147483647'
+    );
+    return data.data;
+  }
 };
 
 interface UseDebateList {
@@ -29,7 +39,7 @@ const useDebateList = (): UseDebateList => {
       if (searchWord !== 'all#@!') {
         if (online) {
           return filterBySearchWord(debateList, searchWord).filter(
-            (debate) => debate.userState
+            (debate) => debate.userState === 'Y'
           );
         }
         return filterBySearchWord(debateList, searchWord);
@@ -37,7 +47,7 @@ const useDebateList = (): UseDebateList => {
       if (currentTag !== 'all#@!') {
         if (online) {
           return filterTagByDebate(debateList, currentTag).filter(
-            (debate) => debate.userState
+            (debate) => debate.userState === 'Y'
           );
         }
         return filterTagByDebate(debateList, currentTag);
@@ -46,25 +56,12 @@ const useDebateList = (): UseDebateList => {
     [currentTag, searchWord, online]
   );
 
-  const defaultFn = useCallback(
-    (debateList: Debate[]) => {
-      if (online) {
-        return debateList.filter((debate) => debate.userState);
-      }
-      return debateList;
-    },
-    [online]
-  );
-
   const fallback: any[] = [];
   const { data: debateList = fallback } = useQuery(
-    queryKeys.debateList,
+    [queryKeys.debateList],
     getDebateList,
     {
-      select:
-        searchWord !== 'all#@!' || currentTag !== 'all#@!'
-          ? selectFn
-          : defaultFn,
+      select: selectFn,
     }
   );
 

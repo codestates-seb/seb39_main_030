@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useLayoutEffect, useState } from 'react';
-import { menuArr } from './TagTabData';
+import { tagArr } from './TagTabData';
 import { Text } from '../../../atom/Text';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
@@ -34,7 +34,7 @@ export const TagTab = () => {
   return (
     <StyledTabContainer>
       <StyledTabMenu>
-        {menuArr.map((el, idx) => {
+        {tagArr.map((el, idx) => {
           return (
             <li
               key={idx}
@@ -49,7 +49,7 @@ export const TagTab = () => {
         })}
       </StyledTabMenu>
       <StyledTag>
-        {menuArr[currentTab].tag.map((tag, idx) => (
+        {tagArr[currentTab].tag.map((tag, idx) => (
           <span
             key={idx}
             className={currentTag === tag ? 'tag focused' : 'tag'}
@@ -106,8 +106,9 @@ const StyledTag = styled.div`
   .tag {
     display: inline-block;
     text-align: center;
-    width: 7rem;
-    padding: 10px 10px;
+    width: 120px;
+    height: 40px;
+    line-height: 40px;
     border: 1px solid ${({ theme }) => theme.mode.themeIcon};
     border-radius: 20px;
     margin: 10px;
