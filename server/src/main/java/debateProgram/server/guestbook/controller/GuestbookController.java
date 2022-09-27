@@ -51,11 +51,11 @@ public class GuestbookController {
      * 방명록 삭제 API
      */
     @DeleteMapping
-    public ResponseEntity deleteGuestbook(@RequestParam("guestCode") int guestCode,
+    public ResponseEntity deleteGuestbook(@RequestParam("userCode") int userCode,
                                           @RequestParam("bookCode") int bookCode){
         Guestbook findBook = guestbookService.findVerifiedGuestBook(bookCode);
 
-        if(findBook.getGuestCode() != guestCode){
+        if(findBook.getGuestCode() != userCode){
             String result = "작성자만 삭제 가능";
             return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
         } else {
@@ -68,16 +68,15 @@ public class GuestbookController {
      * 방명록 수정 API
      */
     @PostMapping("/update")
-    public ResponseEntity updateGuestbook(@RequestParam("viewerCode") int viewerCode,
-                                          @RequestBody UpdateGuestbookRequestDto dto) {
+    public ResponseEntity updateGuestbook(@RequestBody UpdateGuestbookRequestDto dto) {
         int userCode = guestbookService.findVerifiedGuestBook(dto.getGuestbookCode()).getGuestCode();
 
-        if (viewerCode == userCode) {
+        if (dto.getUserCode() == userCode) {
             guestbookService.updateGuestbook(dto);
             Guestbook result = guestbookService.findVerifiedGuestBook(dto.getGuestbookCode());
-
             return new ResponseEntity<>(result, HttpStatus.CREATED);
-        } else {
+        }
+        else {
             String result = "작성자만 수정 가능";
             return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
         }

@@ -29,4 +29,6 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Integer>
             "FROM discussion d JOIN user u ON d.user_code = u.user_code WHERE d.discussion_code = :code", nativeQuery = true)
     UserDetailDto findUserInfo(@Param("code") int discussionCode);
 
+    @Transactional
+    void deleteAllByUserCode(int userCode);
 }

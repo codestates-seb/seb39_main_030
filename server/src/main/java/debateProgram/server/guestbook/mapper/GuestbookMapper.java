@@ -11,5 +11,4 @@ public interface GuestbookMapper {
 
     Guestbook writeRequestToGuestbook(WriteGuestbookRequestDto requestDto);
 
-
 }

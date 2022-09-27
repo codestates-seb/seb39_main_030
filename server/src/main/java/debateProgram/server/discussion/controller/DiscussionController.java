@@ -6,6 +6,7 @@ import debateProgram.server.discussion.entity.Discussion;
 import debateProgram.server.discussion.mapper.DiscussionMapper;
 import debateProgram.server.discussion.model.*;
 import debateProgram.server.discussion.service.DiscussionService;
+import debateProgram.server.dto.MultiResponseDto;
 import debateProgram.server.user.entity.User;
 import debateProgram.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class DiscussionController {
     private final UserService userService;
 
     /**
-     * 토론 게시글 생성 API
+     * 토론글 생성 API
      */
     @PostMapping
     public ResponseEntity postDiscussion(@RequestBody PostDiscussionRequestDto postDiscussionRequestDto) {
@@ -50,8 +51,7 @@ public class DiscussionController {
     }
 
     /**
-     * 토론 게시글 page, size에 따른 조회 API (무한 스크롤)
-     * DiscussionCode를 기준으로 DESC 정렬
+     * 토론글 전체 조회 API
      */
     @GetMapping
     public ResponseEntity getAllDiscussions(@RequestParam int page, @RequestParam int size) {
@@ -80,11 +80,11 @@ public class DiscussionController {
             result.add(responseDto);
         }
 
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(new MultiResponseDto<>(result, pageDiscussions), HttpStatus.OK);
     }
 
     /**
-     * 토론 게시글 상세 조회 API
+     * 토론글 상세 조회 API
      */
     @GetMapping("/detail/{discussion-code}")
     public ResponseEntity getDiscussionDetails(@PathVariable("discussion-code") int discussionCode) {
@@ -117,18 +117,15 @@ public class DiscussionController {
     }
 
     /**
-     * 토론 게시글 삭제 API
+     * 토론글 삭제 API
      */
-    @DeleteMapping("/{discussion-code}")
-    public ResponseEntity deleteDiscussion(@PathVariable("discussion-code") int discussionCode,
-                                           @RequestParam("viewerCode") int viewerCode) {
-        int userCode = discussionService.findDiscussionDetails(discussionCode).getUserCode();
+    @DeleteMapping
+    public ResponseEntity deleteDiscussion(@RequestParam("discussionCode") int discussionCode,
+                                           @RequestParam("userCode") int userCode) {
+        int writerCode = discussionService.findVerifiedDiscussion(discussionCode).getUserCode();
 
-        if (userCode == viewerCode) {
+        if (writerCode == userCode) {
             discussionService.deleteDiscussion(discussionCode);
-
-            List<Comments> commentsList = commentsService.findDiscussionComments(discussionCode);
-            commentsService.deleteComments(commentsList);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         else {
@@ -138,15 +135,14 @@ public class DiscussionController {
     }
 
     /**
-     * 토론 게시글 수정 API
+     * 토론글 수정 API
      */
     @PostMapping("/update")
-    public ResponseEntity updateDiscussion(@RequestParam("viewerCode") int viewerCode,
-                                           @RequestBody UpdateDiscussionRequestDto updateDiscussionRequestDto) {
-        Discussion details = discussionService.findDiscussionDetails(updateDiscussionRequestDto.getDiscussionCode());
-        int userCode = details.getUserCode();
+    public ResponseEntity updateDiscussion(@RequestBody UpdateDiscussionRequestDto requestDto) {
+        Discussion details = discussionService.findVerifiedDiscussion(requestDto.getDiscussionCode());
+        int writerCode = details.getUserCode();
 
-        if (userCode == viewerCode) {
+        if (writerCode == requestDto.getUserCode()) {
             Discussion discussion = discussionService.updateDiscussion(details);
             UpdateDiscussionResponseDto response = discussionMapper.discussionToUpdateResponse(discussion);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -158,15 +154,15 @@ public class DiscussionController {
     }
 
     /**
-     * 토론 게시글 좋아요 수 변경 API
+     * 토론글 좋아요 수 변경 API
      */
-    @PostMapping("/likes/{discussion-code}")
-    public ResponseEntity updateDiscussionLikes(@PathVariable("discussion-code") int discussionCode,
-                                                @RequestParam("viewerCode") int viewerCode,
+    @PostMapping("/likes")
+    public ResponseEntity updateDiscussionLikes(@RequestParam("discussionCode") int discussionCode,
+                                                @RequestParam("userCode") int userCode,
                                                 @RequestParam("likes") int likes) {
-        int userCode = discussionService.findDiscussionDetails(discussionCode).getUserCode();
+        int writerCode = discussionService.findVerifiedDiscussion(discussionCode).getUserCode();
 
-        if (userCode == viewerCode) {
+        if (writerCode == userCode) {
             String result = "본인의 좋아요는 증감 불가";
             return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
         }

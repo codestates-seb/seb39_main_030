@@ -11,8 +11,6 @@ import java.util.List;
 
 public interface CommentsRepository extends JpaRepository<Comments, Integer> {
 
-    @Modifying
-    @Transactional
     @Query(value = "SELECT * FROM comments WHERE discussion_code = :discussionCode", nativeQuery = true)
     List<Comments> findByAllDiscussionComments(@Param("discussionCode") int discussionCode);
 
@@ -20,4 +18,11 @@ public interface CommentsRepository extends JpaRepository<Comments, Integer> {
     @Transactional
     @Query(value = "UPDATE comments SET comment_contents = :commentContents WHERE comment_code = :commentCode", nativeQuery = true)
     void updateComment(@Param("commentContents") String commentContents, @Param("commentCode") int commentCode);
+
+
+    @Transactional
+    void deleteAllByDiscussionCode(int discussionCode);
+
+    @Transactional
+    void deleteAllByUserCode(int userCode);
 }

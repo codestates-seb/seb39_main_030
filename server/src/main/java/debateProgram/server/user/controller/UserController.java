@@ -52,7 +52,7 @@ public class UserController {
     @DeleteMapping
     public ResponseEntity deleteUser(@RequestParam("userCode") int userCode,
                                      @RequestParam("kakaoEmail") String email){
-        String result = userService.verifyEmailAndDelete(userCode, email);
+        String result = userService.verifyEmailAndDeleteAll(userCode, email);
 
         if(result.equals("FAIL")){
             return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);

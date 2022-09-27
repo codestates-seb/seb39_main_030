@@ -2,6 +2,7 @@ package debateProgram.server.questions.mapper;
 
 import debateProgram.server.questions.entity.Questions;
 import debateProgram.server.questions.model.CreateQuestionRequestDto;
+import debateProgram.server.questions.model.CreateQuestionResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

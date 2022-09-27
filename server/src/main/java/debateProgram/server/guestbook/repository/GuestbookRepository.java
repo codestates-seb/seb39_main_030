@@ -22,4 +22,7 @@ public interface GuestbookRepository extends JpaRepository<Guestbook, Integer> {
     @Transactional
     @Query(value = "UPDATE guestbook SET guestbook_contents = :contents WHERE guestbook_code = :code", nativeQuery = true)
     void UpdateGuestbook(@Param("contents") String contents, @Param("code") int code);
+
+    @Transactional
+    void deleteAllByUserCode(int userCode);
 }

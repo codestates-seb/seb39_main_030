@@ -16,4 +16,6 @@ public interface DeclarationRepository extends JpaRepository<Declaration, Intege
     @Query(value = "UPDATE declaration SET declaration_answer = :answer, declaration_clear = 'Y' WHERE declaration_code = :code", nativeQuery = true)
     void registerFeedBack(@Param("answer") String answer, @Param("code") int code);
 
+    @Transactional
+    void deleteAllByUserCode(int userCode);
 }
