@@ -1,4 +1,4 @@
-export const menuArr = [
+export const tagArr = [
   { tab: '정치', tag: ['정당', '대통령', '정치학', '이데올로기'] },
   { tab: '사회', tag: ['사건/사고', '법', '교육', '환경'] },
   { tab: '문화', tag: ['지역', '음식', '의복', '여행'] },

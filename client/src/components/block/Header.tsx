@@ -7,6 +7,7 @@ import { TbSearch } from 'react-icons/tb';
 import { FiLogIn } from 'react-icons/fi';
 import { FiLogOut } from 'react-icons/fi';
 import { BiUser } from 'react-icons/bi';
+import { TiDocumentText } from 'react-icons/ti';
 import { GiDiscussion } from 'react-icons/gi';
 import { TbZoomCancel } from 'react-icons/tb';
 
@@ -14,13 +15,14 @@ import { media } from '../../style/media';
 import { Text } from '../atom/Text';
 import DarkModeButton from '../atom/DarkModeButton';
 import HamburgerMenu from '../atom/HamburgerMenu';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import useModal from '../app/hooks/useModal';
 import { useRef, useState } from 'react';
 import useOutSideClick from '../app/hooks/useOutSideClick';
 
 const Header = () => {
   const [showProfile, setShowProfile] = useState<boolean>();
+  const navigate = useNavigate();
   const userProfileRef = useRef();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.userInfo);
@@ -52,6 +54,16 @@ const Header = () => {
     setShowProfile(false);
   };
 
+  const linkMyPageHandler = () => {
+    setShowProfile(false);
+    navigate('/mypage');
+  };
+
+  const linkMyViewHandler = () => {
+    setShowProfile(false);
+    navigate('/myview');
+  };
+
   useOutSideClick(
     userProfileRef,
     showProfile
@@ -79,9 +91,21 @@ const Header = () => {
       </NavLink>
       <nav>
         <ul>
-          <li className="menu">
-            <NavStyle to="/add-debate">토론생성</NavStyle>
-          </li>
+          {user && (
+            <li className="menu">
+              <NavStyle to="/add-debate">토론생성</NavStyle>
+            </li>
+          )}
+          {user && (
+            <li className="menu">
+              <NavStyle to="/admin-contact">문의하기</NavStyle>
+            </li>
+          )}
+          {user?.userRole === 'ROLE_ADMIN' && (
+            <li className="menu">
+              <NavStyle to="/admin">⚙️ 관리자</NavStyle>
+            </li>
+          )}
           <li className="search-menu">
             <TbSearch className="search" onClick={searchButtonHandler} />
             <TbZoomCancel className="close" onClick={searchButtonHandler} />
@@ -95,13 +119,18 @@ const Header = () => {
                 onClick={openProfileHandler}
                 className="userProfile"
                 src={user.profileImg}
+                alt="유저프로필"
               />
               <div className="userProfileInfo">
                 <ul>
-                  <li>
+                  <li onClick={linkMyPageHandler}>
                     <BiUser />내 정보
                   </li>
-                  <li onClick={openLogoutHandler}>
+                  <li onClick={linkMyViewHandler}>
+                    <TiDocumentText />
+                    내가 쓴 글
+                  </li>
+                  <li className="fi-logout" onClick={openLogoutHandler}>
                     <FiLogOut /> 로그아웃
                   </li>
                 </ul>
@@ -154,6 +183,9 @@ const StyledHeader = styled.header<{
       align-items: flex-start;
       padding: 10px;
       margin-top: 5px;
+      .fi-logout {
+        margin-left: 18px;
+      }
     }
 
     li {
@@ -180,7 +212,7 @@ const StyledHeader = styled.header<{
     border-bottom: 10px solid ${({ theme }) => theme.mode.mainBackground};
     position: absolute;
     top: -16px;
-    left: 112px;
+    left: 121px;
   }
 
   .userProfileInfo::before {
@@ -191,7 +223,7 @@ const StyledHeader = styled.header<{
     border-left: 8px solid transparent;
     border-bottom: 10px solid ${({ theme }) => theme.mode.themeIcon};
     top: -18px;
-    left: 112px;
+    left: 121px;
   }
 
   .dark-mode--desktop {
@@ -206,7 +238,7 @@ const StyledHeader = styled.header<{
     height: 32px;
     margin-top: 4px;
     cursor: pointer;
-    box-shadow: 0px 0px 15px ${({ theme }) => theme.mode.searchBar};
+    box-shadow: 0 0 15px ${({ theme }) => theme.mode.searchBar};
   }
   a:link,
   a:visited {

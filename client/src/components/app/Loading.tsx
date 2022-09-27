@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
-const Loading = () => {
+const Loading = ({ sub }) => {
   return (
-    <StyledLoading>
+    <StyledLoading sub={sub}>
       <div className="spinner"></div>
     </StyledLoading>
   );
@@ -10,7 +10,7 @@ const Loading = () => {
 
 export default Loading;
 
-const StyledLoading = styled.div`
+const StyledLoading = styled.div<{ sub }>`
   width: 100%;
   height: 100%;
   top: 0;
@@ -27,7 +27,7 @@ const StyledLoading = styled.div`
 
   .spinner {
     box-sizing: border-box;
-    position: absolute;
+    position: ${(props) => (props.sub ? 'relative' : 'absolute')};
     top: 50%;
     left: 50%;
     width: 50px;

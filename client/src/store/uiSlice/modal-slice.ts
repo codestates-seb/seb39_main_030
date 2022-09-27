@@ -4,10 +4,12 @@ import { RootState } from '../index';
 interface Modal {
   type: string;
   props: any;
+  signal: boolean;
 }
 const initialState: Modal = {
   type: null,
   props: null,
+  signal: false,
 };
 
 export const modalSelector = (state: RootState) => state.modal;
@@ -24,8 +26,11 @@ const modalSlice = createSlice({
     closeModal: () => {
       return initialState;
     },
+    signal: (state, action) => {
+      state.signal = action.payload;
+    },
   },
 });
 
-export const { openModal, closeModal } = modalSlice.actions;
+export const { openModal, closeModal, signal } = modalSlice.actions;
 export default modalSlice;

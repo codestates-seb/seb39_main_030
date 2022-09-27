@@ -1,8 +1,8 @@
 import styled from 'styled-components';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Item from '../../block/Carousel/Item';
 import TagTab from './TagTab/TagTab';
-import DebateList from './DebateList';
+import DebateList from './component/DebateList';
 import { Text } from '../../atom/Text';
 import { media } from '../../../style/media';
 import Toggle from '../../atom/Toggle';
@@ -11,9 +11,11 @@ import { toggleActions } from '../../../store/debateToggle-slice';
 
 const LendingPage = () => {
   const dispatch = useDispatch();
+
   const toggleHandler = (state) => {
     dispatch(toggleActions.setToggle(state));
   };
+
   return (
     <StyledLendingPage>
       <SlickContainer>
@@ -40,6 +42,8 @@ const StyledLendingPage = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 1200px;
+  margin: auto;
 
   .contents {
     border: 1px solid ${({ theme }) => theme.mode.themeIcon};

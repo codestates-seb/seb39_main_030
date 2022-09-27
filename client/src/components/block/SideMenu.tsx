@@ -21,6 +21,7 @@ const SideMenu = () => {
     sideMenuCloseHandler();
     openModal({ type: 'login' });
   };
+
   const openLogoutHandler = () => {
     sideMenuCloseHandler();
     openModal({ type: 'logout' });
@@ -42,9 +43,16 @@ const SideMenu = () => {
   return (
     <StyledSideMenu ref={sideMenuRef} open={open}>
       <div className="margin"></div>
-      <li className="menu" onClick={sideMenuCloseHandler}>
-        <NavStyle to="/add-debate">토론생성</NavStyle>
-      </li>
+      {user && (
+        <li className="menu" onClick={sideMenuCloseHandler}>
+          <NavStyle to="/add-debate">토론생성</NavStyle>
+        </li>
+      )}
+      {user && (
+        <li className="menu" onClick={sideMenuCloseHandler}>
+          <NavStyle to="/admin-contact">문의하기</NavStyle>
+        </li>
+      )}
       {user ? (
         <li className="menu" onClick={openLogoutHandler}>
           <NavStyle to={window.location.pathname}>로그아웃</NavStyle>
@@ -52,6 +60,11 @@ const SideMenu = () => {
       ) : (
         <li className="menu" onClick={openLoginHandler}>
           <NavStyle to={window.location.pathname}>로그인</NavStyle>
+        </li>
+      )}
+      {user?.userRole === 'ROLE_ADMIN' && (
+        <li className="menu" onClick={sideMenuCloseHandler}>
+          <NavStyle to="/admin">⚙️ 관리자</NavStyle>
         </li>
       )}
     </StyledSideMenu>
