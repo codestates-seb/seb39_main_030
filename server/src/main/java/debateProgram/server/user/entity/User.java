@@ -1,6 +1,7 @@
 package debateProgram.server.user.entity;
 
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @Entity
 @Table(name="user")
 @NoArgsConstructor
+@DynamicInsert
 public class User {
 
     @Id

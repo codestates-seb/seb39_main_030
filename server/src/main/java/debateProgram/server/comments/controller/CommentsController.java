@@ -47,10 +47,10 @@ public class CommentsController {
      */
     @DeleteMapping("/delete")
     public ResponseEntity deleteComment(@RequestParam("commentCode") int commentCode,
-                                        @RequestParam("viewerCode") int viewerCode) {
-        int userCode = commentsService.findVerifiedComment(commentCode).getUserCode();
+                                        @RequestParam("userCode") int userCode) {
+        int writerCode = commentsService.findVerifiedComment(commentCode).getUserCode();
 
-        if (userCode == viewerCode) {
+        if (writerCode == userCode) {
             commentsService.deleteComment(commentCode);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -64,12 +64,12 @@ public class CommentsController {
      * 댓글 수정 API
      */
     @PostMapping("/update")
-    public ResponseEntity updateComment(@RequestParam("viewerCode") int viewerCode,
+    public ResponseEntity updateComment(@RequestParam("userCode") int userCode,
                                         @RequestBody UpdateCommentRequestDto requestDto) {
         Comments commentDetails = commentsService.findVerifiedComment(requestDto.getCommentCode());
-        int userCode = commentDetails.getUserCode();
+        int writerCode = commentDetails.getUserCode();
 
-        if (userCode == viewerCode) {
+        if (writerCode == userCode) {
             commentsService.updateComment(requestDto);
             Comments result = commentsService.findVerifiedComment(requestDto.getCommentCode());
             UpdateCommentResponseDto response = commentsMapper.commentToUpdateResponse(result);
