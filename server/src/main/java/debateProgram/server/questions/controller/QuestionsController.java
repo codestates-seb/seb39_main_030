@@ -83,6 +83,15 @@ public class QuestionsController {
         return new ResponseEntity<>(savedQ, HttpStatus.CREATED);
     }
 
+    @PostMapping("/test")
+    public ResponseEntity createQuestionTest(@RequestBody CreateQuestionRequestDto requestDto) {
+        Questions question = questionsMapper.createRequestToQuestion(requestDto);
+        Questions savedQ = questionsService.createQuestionTest(question);
+
+        return new ResponseEntity<>(savedQ, HttpStatus.CREATED);
+    }
+
+
     /**
      * 문의글 삭제 API (작성자 or 관리자만 가능)
      */
@@ -118,6 +127,6 @@ public class QuestionsController {
             Questions result = questionsService.findVerifiedQuestion(requestDto.getQuestionCode());
             return new ResponseEntity<>(result, HttpStatus.CREATED);
         }
-
     }
+
 }
