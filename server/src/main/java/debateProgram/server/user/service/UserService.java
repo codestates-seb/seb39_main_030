@@ -123,7 +123,6 @@ public class UserService {
         else {
             userRepository.updateProfile(user.getUserCode(),
                     profile.getKakao_account().getProfile().getProfile_image_url(),
-                    profile.getKakao_account().getProfile().getNickname(),
                     profile.getKakao_account().getEmail());
             userRepository.updateUserState(user.getUserCode(), "Y");
         }
