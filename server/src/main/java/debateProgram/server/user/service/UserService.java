@@ -70,7 +70,7 @@ public class UserService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", client_id);
-        params.add("redirect_uri", "http://localhost:3000/auth");
+        params.add("redirect_uri", "http://pre-project-team30.s3-website.ap-northeast-2.amazonaws.com/auth");
         params.add("code", code);
         params.add("client_secret", client_secret);
 
@@ -118,9 +118,13 @@ public class UserService {
                     .userRole("ROLE_USER")
                     .userState("Y")
                     .build();
-
             userRepository.save(user);
-        } else {
+        }
+        else {
+            userRepository.updateProfile(user.getUserCode(),
+                    profile.getKakao_account().getProfile().getProfile_image_url(),
+                    profile.getKakao_account().getProfile().getNickname(),
+                    profile.getKakao_account().getEmail());
             userRepository.updateUserState(user.getUserCode(), "Y");
         }
 

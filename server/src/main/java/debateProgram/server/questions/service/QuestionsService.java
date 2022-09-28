@@ -56,6 +56,11 @@ public class QuestionsService {
         return result;
     }
 
+    @Transactional
+    public Questions createQuestionTest(Questions question) {
+        return questionsRepository.save(question);
+    }
+
     public void deleteQuestion(Questions question) {
         questionsRepository.delete(question);
     }
