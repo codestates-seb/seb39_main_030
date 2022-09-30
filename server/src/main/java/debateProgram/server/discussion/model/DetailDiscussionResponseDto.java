@@ -17,6 +17,7 @@ public class DetailDiscussionResponseDto {
     private String category;
     private String tag;
     private int likes;
+    private String recommendState;
     private UserDetailDto userInfo;
 
 }

@@ -7,7 +7,11 @@ import debateProgram.server.discussion.model.UserDetailDto;
 import debateProgram.server.discussion.repository.DiscussionRepository;
 import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
+import debateProgram.server.user.recommend.Recommend;
+import debateProgram.server.user.recommend.RecommendRepository;
+import debateProgram.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Component
 @RequiredArgsConstructor
@@ -26,9 +31,9 @@ public class DiscussionService {
 
     private final CommentsRepository commentsRepository;
 
-    /**
-     * 토론글 상세
-     */
+    private final UserService userService;
+
+
     public Discussion findVerifiedDiscussion(int discussionCode) {
         Optional<Discussion> optionalDiscussion = discussionRepository.findById(discussionCode);
 
@@ -38,8 +43,13 @@ public class DiscussionService {
         return findDiscussion;
     }
 
-    public DetailDiscussionResponseDto findDiscussionWithUser(int discussionCode){
+    /**
+     * 토론글 상세
+     */
+    public DetailDiscussionResponseDto findDiscussionWithUser(int discussionCode, int loginUserCode){
         Discussion d = findVerifiedDiscussion(discussionCode);
+        Recommend r = userService.findLikesHistory(loginUserCode, discussionCode);
+        if(r.getLikes()==null) r.setLikes("N");
         UserDetailDto userInfo = discussionRepository.findUserInfo(discussionCode);
 
         DetailDiscussionResponseDto dto = DetailDiscussionResponseDto.builder()
@@ -51,6 +61,7 @@ public class DiscussionService {
                 .category(d.getDiscussionCategory())
                 .tag(d.getDiscussionTag())
                 .likes(d.getDiscussionLikes())
+                .recommendState(r.getLikes())
                 .userInfo(userInfo)
                 .build();
 

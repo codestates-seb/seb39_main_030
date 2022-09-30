@@ -9,20 +9,21 @@ import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
 import debateProgram.server.guestbook.repository.GuestbookRepository;
 import debateProgram.server.questions.repository.QuestionsRepository;
+import debateProgram.server.user.recommend.Recommend;
 import debateProgram.server.user.entity.User;
 import debateProgram.server.user.model.*;
 import debateProgram.server.user.model.AllListsInterface.CommentsDto;
 import debateProgram.server.user.model.AllListsInterface.DeclarationsDto;
 import debateProgram.server.user.model.AllListsInterface.DiscussionsDto;
 import debateProgram.server.user.model.AllListsInterface.QuestionsDto;
+import debateProgram.server.user.recommend.RecommendRepository;
 import debateProgram.server.user.repository.UserRepository;
+import debateProgram.server.user.tags.TagsRepository;
+import debateProgram.server.user.tags.UserTags;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +57,10 @@ public class UserService {
     private final DeclarationRepository declarationRepository;
 
     private final GuestbookRepository guestbookRepository;
+
+    private final RecommendRepository recommendRepository;
+
+    private final TagsRepository tagsRepository;
 
 
     public OauthToken getAccessToken(String code) {
@@ -179,12 +184,32 @@ public class UserService {
         return findUser;
     }
 
+    public UpdateUserResponseDto findUserInfo(int userCode) {
+        User user = findVerifiedUser(userCode);
+        UserTags tagList = tagsRepository.findByUserCode(userCode);
 
-    public User updateUserInfo(UpdateUserRequestDto dto) {
+        UpdateUserResponseDto dto = UpdateUserResponseDto.builder()
+                .userCode(user.getUserCode())
+                .userState(user.getUserState())
+                .discussionState(user.getDiscussionState())
+                .kakaoId(user.getKakaoId())
+                .nickname(user.getNickname())
+                .profileImg(user.getProfileImg())
+                .kakaoEmail(user.getKakaoEmail())
+                .userLikes(user.getUserLikes())
+                .socketId(user.getSocketId())
+                .tags(tagList)
+                .build();
+        return dto;
+    }
+
+    public UpdateUserResponseDto updateUserInfo(UpdateUserRequestDto dto) {
         userRepository.updateInfo(dto.getUserCode(), dto.getNickname(), dto.getProfileImg(), dto.getKakaoEmail());
-        User findUser = findVerifiedUser(dto.getUserCode());
+        tagsRepository.updateTags(dto.getUserCode(), dto.getTag1(), dto.getTag2(), dto.getTag3());
 
-        return findUser;
+        UpdateUserResponseDto userInfo = findUserInfo(dto.getUserCode());
+
+        return userInfo;
     }
 
 
@@ -216,6 +241,11 @@ public class UserService {
     public String verifyEmailAndDeleteAll(int userCode, String email) {
         User user = findVerifiedUser(userCode);
         String result = "";
+
+        /**
+         * 이메일 검증 로직
+         */
+
 
         if (user.getKakaoEmail().equals(email)) {
             guestbookRepository.deleteAllByUserCode(user.getUserCode());
@@ -259,4 +289,23 @@ public class UserService {
         User user = findVerifiedUser(userCode);
         return user;
     }
+
+    public Recommend findLikesHistory(int userCode, int targetCode) {
+        Optional<Recommend> optionalRecommend = recommendRepository.findByUserCodeAndTargetCode(userCode, targetCode);
+        Recommend findRecommend = optionalRecommend.orElseGet(Recommend::new);
+
+        return findRecommend;
+    }
+
+    public void saveUserRecommend(Recommend recommend) {
+        recommendRepository.save(recommend);
+    }
+
+    public void updateUserRecommend(Recommend recommend) {
+        int userCode = recommend.getUserCode();
+        int targetCode = recommend.getTargetCode();
+        String state = recommend.getLikes();
+        recommendRepository.updateLikesState(userCode, targetCode, state);
+    }
+
 }
