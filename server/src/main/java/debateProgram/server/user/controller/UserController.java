@@ -11,7 +11,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.regex.Pattern;
 
 
 @Slf4j
@@ -57,6 +61,11 @@ public class UserController {
     @DeleteMapping
     public ResponseEntity deleteUser(@RequestParam("userCode") int userCode,
                                      @RequestParam("kakaoEmail") String email){
+        String regexp = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+        if (!Pattern.matches(regexp, email)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         String result = userService.verifyEmailAndDeleteAll(userCode, email);
 
         if(result.equals("FAIL")){
@@ -80,7 +89,10 @@ public class UserController {
      * 마이페이지 수정 API
      */
     @PostMapping("/myInfo")
-    public ResponseEntity updateUserInfo(@RequestBody UpdateUserRequestDto updateUserRequestDto){
+    public ResponseEntity updateUserInfo(@Valid @RequestBody UpdateUserRequestDto updateUserRequestDto, Errors errors){
+        if (errors.hasErrors()) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         UpdateUserResponseDto updateResult = userService.updateUserInfo(updateUserRequestDto);
 
         return new ResponseEntity<>(updateResult, HttpStatus.CREATED);
