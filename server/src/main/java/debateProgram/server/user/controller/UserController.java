@@ -145,7 +145,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        Recommend history = userService.findLikesHistory(userCode, targetCode);
+        Recommend history = userService.findVerifiedRecommend(userCode, targetCode);
 
         // 좋아요 수 증가를 원하는 경우
         if(recommend.getLikes().equals("Y")){
