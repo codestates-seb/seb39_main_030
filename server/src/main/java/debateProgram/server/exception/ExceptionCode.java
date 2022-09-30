@@ -17,7 +17,10 @@ public enum ExceptionCode {
     QUESTION_CODE_EXISTS(409, "Question Code exists"),
 
     GUESTBOOK_NOT_FOUND(404, "Guestbook not found"),
-    GUESTBOOK_CODE_EXISTS(409, "Guestbook Code exists");
+    GUESTBOOK_CODE_EXISTS(409, "Guestbook Code exists"),
+
+    RECOMMEND_NOT_FOUND(404, "Recommend not found"),
+    RECOMMEND_CODE_EXISTS(409, "Recommend Code exists");
 
 
 //    ORDER_NOT_FOUND(404, "Order not found"),
