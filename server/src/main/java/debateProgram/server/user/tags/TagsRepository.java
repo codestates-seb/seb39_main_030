@@ -18,6 +18,8 @@ public interface TagsRepository extends JpaRepository<Tags, Integer> {
     @Query(value = "UPDATE tags SET tag1=:tag1, tag2=:tag2, tag3=:tag3 WHERE user_code=:userCode", nativeQuery = true)
     void updateTags(@Param("userCode") int userCode, @Param("tag1") String tag1, @Param("tag2") String tag2, @Param("tag3") String tag3);
 
-
-
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO tags(user_code, tag1, tag2, tag3) VALUES (:userCode, :tag1, :tag2, :tag3)", nativeQuery = true)
+    void saveTags(@Param("userCode") int userCode, @Param("tag1") String tag1, @Param("tag2") String tag2, @Param("tag3") String tag3);
 }

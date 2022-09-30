@@ -11,8 +11,8 @@ import java.util.List;
 
 public interface CommentsRepository extends JpaRepository<Comments, Integer> {
 
-    @Query(value = "SELECT * FROM comments WHERE discussion_code = :discussionCode", nativeQuery = true)
-    List<Comments> findByAllDiscussionComments(@Param("discussionCode") int discussionCode);
+    @Query(value = "SELECT * FROM comments WHERE discussion_code = :discussionCode ORDER BY comment_create_date DESC", nativeQuery = true)
+    List<Comments> findByDiscussionCode(@Param("discussionCode") int discussionCode);
 
     @Modifying
     @Transactional

@@ -12,6 +12,7 @@ import debateProgram.server.guestbook.repository.GuestbookRepository;
 import debateProgram.server.user.entity.User;
 import debateProgram.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
