@@ -290,6 +290,14 @@ public class UserService {
         return user;
     }
 
+    @Transactional(readOnly = true)
+    public Recommend findVerifiedRecommend(int userCode, int targetCode) {
+        Optional<Recommend> optionalRecommend = recommendRepository.findByUserCodeAndTargetCode(userCode, targetCode);
+        Recommend recommend = optionalRecommend.orElse(null);
+
+        return recommend;
+    }
+
     public Recommend findLikesHistory(int userCode, int targetCode) {
         Optional<Recommend> optionalRecommend = recommendRepository.findByUserCodeAndTargetCode(userCode, targetCode);
         Recommend findRecommend = optionalRecommend.orElseGet(Recommend::new);
