@@ -2,9 +2,7 @@ package debateProgram.server.guestbook.controller;
 
 import debateProgram.server.guestbook.entity.Guestbook;
 import debateProgram.server.guestbook.mapper.GuestbookMapper;
-import debateProgram.server.guestbook.model.UpdateGuestbookRequestDto;
-import debateProgram.server.guestbook.model.UserBookResponseDto;
-import debateProgram.server.guestbook.model.WriteGuestbookRequestDto;
+import debateProgram.server.guestbook.model.*;
 import debateProgram.server.guestbook.service.GuestbookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +24,15 @@ public class GuestbookController {
 
     private final GuestbookMapper guestbookMapper;
 
+
     /**
      * 방명록 조회 API
      */
     @GetMapping
     public ResponseEntity getMyGuestbook(@RequestParam("userCode") int userCode){
-        List<UserBookResponseDto> userGuestbook = guestbookService.findUserGuestbook(userCode);
+        List<UserGuestBookResponseDto> result = guestbookService.findUserGuestbook(userCode);
 
-        return new ResponseEntity<>(userGuestbook, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     /**
@@ -69,11 +68,11 @@ public class GuestbookController {
      */
     @PostMapping("/update")
     public ResponseEntity updateGuestbook(@RequestBody UpdateGuestbookRequestDto dto) {
-        int userCode = guestbookService.findVerifiedGuestBook(dto.getGuestbookCode()).getGuestCode();
+        int userCode = guestbookService.findVerifiedGuestBook(dto.getBookCode()).getGuestCode();
 
         if (dto.getUserCode() == userCode) {
             guestbookService.updateGuestbook(dto);
-            Guestbook result = guestbookService.findVerifiedGuestBook(dto.getGuestbookCode());
+            Guestbook result = guestbookService.findVerifiedGuestBook(dto.getBookCode());
             return new ResponseEntity<>(result, HttpStatus.CREATED);
         }
         else {
