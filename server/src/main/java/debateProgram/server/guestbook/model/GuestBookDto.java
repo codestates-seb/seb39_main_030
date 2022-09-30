@@ -2,7 +2,7 @@ package debateProgram.server.guestbook.model;
 
 import java.time.LocalDateTime;
 
-public interface UserBookResponseDto {
+public interface GuestBookDto {
 
     int getBookCode();
     int getGuestCode();

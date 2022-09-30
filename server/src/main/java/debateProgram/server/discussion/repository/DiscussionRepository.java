@@ -31,4 +31,5 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Integer>
 
     @Transactional
     void deleteAllByUserCode(int userCode);
+
 }

@@ -86,9 +86,10 @@ public class DiscussionController {
     /**
      * 토론글 상세 조회 API
      */
-    @GetMapping("/detail/{discussion-code}")
-    public ResponseEntity getDiscussionDetails(@PathVariable("discussion-code") int discussionCode) {
-        DetailDiscussionResponseDto result = discussionService.findDiscussionWithUser(discussionCode);
+    @GetMapping("/detail")
+    public ResponseEntity getDiscussionDetails(@RequestParam("discussionCode") int discussionCode,
+                                               @RequestParam("loginUserCode") int loginUserCode) {
+        DetailDiscussionResponseDto result = discussionService.findDiscussionWithUser(discussionCode, loginUserCode);
         List<Comments> comments = commentsService.findDiscussionComments(discussionCode);
 
         List<DetailCommentsResponseDto> commentsDto = new ArrayList<>();
@@ -100,8 +101,9 @@ public class DiscussionController {
 
             DetailCommentsResponseDto dto = DetailCommentsResponseDto.builder()
                     .userCode(userInfo.getUserCode())
-                    .nickname(userInfo.getUserState())
+                    .nickname(userInfo.getNickname())
                     .profileImg(userInfo.getProfileImg())
+                    .commentCode(commentInfo.getCommentCode())
                     .commentContents(commentInfo.getCommentContents())
                     .commentCreateDate(commentInfo.getCommentCreateDate())
                     .build();
@@ -153,22 +155,4 @@ public class DiscussionController {
         }
     }
 
-    /**
-     * 토론글 좋아요 수 변경 API
-     */
-    @PostMapping("/likes")
-    public ResponseEntity updateDiscussionLikes(@RequestParam("discussionCode") int discussionCode,
-                                                @RequestParam("userCode") int userCode,
-                                                @RequestParam("likes") int likes) {
-        int writerCode = discussionService.findVerifiedDiscussion(discussionCode).getUserCode();
-
-        if (writerCode == userCode) {
-            String result = "본인의 좋아요는 증감 불가";
-            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
-        }
-        else {
-            int response = discussionService.updateDiscussionLikes(discussionCode, likes);
-            return new ResponseEntity(response, HttpStatus.CREATED);
-        }
-    }
 }

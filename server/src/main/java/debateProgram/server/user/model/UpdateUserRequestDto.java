@@ -21,4 +21,13 @@ public class UpdateUserRequestDto {
     @NotBlank
     private String kakaoEmail;
 
+    @NotBlank
+    private String tag1;
+
+    @NotBlank
+    private String tag2;
+
+    @NotBlank
+    private String tag3;
+
 }

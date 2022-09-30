@@ -12,6 +12,7 @@ public class DetailCommentsResponseDto {
     private int userCode;
     private String nickname;
     private String profileImg;
+    private int commentCode;
     private String commentContents;
     private LocalDateTime commentCreateDate;
 
