@@ -36,7 +36,7 @@ public class CommentsService {
      * 한 토론글에 달린 모든 댓글 조회
      */
     public List<Comments> findDiscussionComments(int discussionCode) {
-        return commentsRepository.findByAllDiscussionComments(discussionCode);
+        return commentsRepository.findByDiscussionCode(discussionCode);
     }
 
     /**

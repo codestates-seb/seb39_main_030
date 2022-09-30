@@ -4,6 +4,7 @@ import debateProgram.server.comments.repository.CommentsRepository;
 import debateProgram.server.discussion.entity.Discussion;
 
 import debateProgram.server.discussion.model.DetailDiscussionResponseDto;
+import debateProgram.server.discussion.model.UpdateDiscussionRequestDto;
 import debateProgram.server.discussion.model.UserDetailDto;
 
 import debateProgram.server.discussion.repository.DiscussionRepository;
@@ -93,17 +94,14 @@ public class DiscussionService {
         discussionRepository.delete(findDiscussion);
     }
 
-    public Discussion updateDiscussion(Discussion discussion) {
+    public void updateDiscussion(UpdateDiscussionRequestDto dto) {
         discussionRepository.updateDiscussion(
-                discussion.getDiscussionTitle(),
-                discussion.getDiscussionContents(),
-                discussion.getDiscussionCategory(),
-                discussion.getDiscussionTag(),
-                discussion.getDiscussionCode()
+                dto.getDiscussionTitle(),
+                dto.getDiscussionContents(),
+                dto.getDiscussionCategory(),
+                dto.getDiscussionTag(),
+                dto.getDiscussionCode()
         );
-        Discussion result = findVerifiedDiscussion(discussion.getDiscussionCode());
-
-        return result;
     }
 
     /**

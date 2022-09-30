@@ -18,8 +18,7 @@ import debateProgram.server.user.model.AllListsInterface.DiscussionsDto;
 import debateProgram.server.user.model.AllListsInterface.QuestionsDto;
 import debateProgram.server.user.recommend.RecommendRepository;
 import debateProgram.server.user.repository.UserRepository;
-import debateProgram.server.user.tags.TagsRepository;
-import debateProgram.server.user.tags.UserTags;
+import debateProgram.server.user.tags.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -205,7 +204,11 @@ public class UserService {
 
     public UpdateUserResponseDto updateUserInfo(UpdateUserRequestDto dto) {
         userRepository.updateInfo(dto.getUserCode(), dto.getNickname(), dto.getProfileImg(), dto.getKakaoEmail());
-        tagsRepository.updateTags(dto.getUserCode(), dto.getTag1(), dto.getTag2(), dto.getTag3());
+        if(tagsRepository.findByUserCode(dto.getUserCode()) == null){
+            tagsRepository.saveTags(dto.getUserCode(), dto.getTag1(), dto.getTag2(), dto.getTag3());
+        } else {
+            tagsRepository.updateTags(dto.getUserCode(), dto.getTag1(), dto.getTag2(), dto.getTag3());
+        }
 
         UpdateUserResponseDto userInfo = findUserInfo(dto.getUserCode());
 

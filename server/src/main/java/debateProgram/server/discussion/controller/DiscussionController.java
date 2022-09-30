@@ -145,9 +145,8 @@ public class DiscussionController {
         int writerCode = details.getUserCode();
 
         if (writerCode == requestDto.getUserCode()) {
-            Discussion discussion = discussionService.updateDiscussion(details);
-            UpdateDiscussionResponseDto response = discussionMapper.discussionToUpdateResponse(discussion);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            discussionService.updateDiscussion(requestDto);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
         else {
             String result = "수정 불가";
