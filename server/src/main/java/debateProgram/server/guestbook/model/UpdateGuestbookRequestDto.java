@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 public class UpdateGuestbookRequestDto {
 
     @NotBlank
-    private int guestbookCode;
+    private int bookCode;
 
     @NotBlank
     private int userCode;

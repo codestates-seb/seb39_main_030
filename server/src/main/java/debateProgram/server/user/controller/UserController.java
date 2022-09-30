@@ -1,8 +1,11 @@
 package debateProgram.server.user.controller;
 
+import debateProgram.server.discussion.service.DiscussionService;
+import debateProgram.server.user.recommend.Recommend;
 import debateProgram.server.user.entity.User;
 import debateProgram.server.user.mapper.UserMapper;
 import debateProgram.server.user.model.*;
+import debateProgram.server.user.recommend.RecommendRequestDto;
 import debateProgram.server.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +27,8 @@ public class UserController {
     private final UserService userService;
 
     private final UserMapper userMapper;
+
+    private final DiscussionService discussionService;
 
     /**
      * 카카오 oauth 로그인 API
@@ -75,8 +80,7 @@ public class UserController {
      */
     @GetMapping("/myInfo")
     public ResponseEntity userInfo(@RequestParam("userCode") int userCode){
-        User user = userService.findVerifiedUser(userCode);
-        UpdateUserResponseDto result = userMapper.userToUserResponse(user);
+        UpdateUserResponseDto result = userService.findUserInfo(userCode);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -89,10 +93,9 @@ public class UserController {
         if (errors.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        User updateUser = userService.updateUserInfo(updateUserRequestDto);
-        UpdateUserResponseDto result = userMapper.userToUserResponse(updateUser);
+        UpdateUserResponseDto updateResult = userService.updateUserInfo(updateUserRequestDto);
 
-        return new ResponseEntity<>(result, HttpStatus.CREATED);
+        return new ResponseEntity<>(updateResult, HttpStatus.CREATED);
     }
 
     /**
@@ -128,22 +131,6 @@ public class UserController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    /**
-     * 사용자 좋아요 수 변경 API
-     */
-    @PostMapping("/likes")
-    public ResponseEntity updateUserLikes(@RequestParam("userCode") int userCode,
-                                          @RequestParam("viewerCode") int viewerCode,
-                                          @RequestParam("likes") int likes){
-        if(userCode == viewerCode) {
-            String result = "본인의 좋아요는 증감 불가";
-            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
-        }
-        else {
-            int result = userService.updateUserLikes(viewerCode, likes);
-            return new ResponseEntity(result, HttpStatus.CREATED);
-        }
-    }
 
     /**
      * 사용자 socketId 변경 API
@@ -157,6 +144,53 @@ public class UserController {
         return new ResponseEntity(result, HttpStatus.CREATED);
     }
 
+    /**
+     * 사용자의 토론글 좋아요 수 변경 API
+     */
+    @PostMapping("/likes")
+    public ResponseEntity updateUserLikesV2(@RequestBody RecommendRequestDto requestDto){
+        Recommend recommend = userMapper.recommendRequestToRecommend(requestDto);
+        int userCode = recommend.getUserCode();
+        int targetCode = recommend.getTargetCode();
 
+        if(userCode == targetCode){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        Recommend history = userService.findVerifiedRecommend(userCode, targetCode);
+
+        // 좋아요 수 증가를 원하는 경우
+        if(recommend.getLikes().equals("Y")){
+            if(history==null || history.getLikes().equals("N")){
+                if(history==null){
+                    userService.saveUserRecommend(recommend);
+                    discussionService.updateDiscussionLikes(targetCode, 1);
+                }
+                else if(history.getLikes().equals("N")){
+                    userService.updateUserRecommend(recommend);
+                    discussionService.updateDiscussionLikes(targetCode, 1);
+                }
+                return new ResponseEntity<>(HttpStatus.CREATED);
+            }
+            else {
+                String result = "이미 좋아요를 눌렀음";
+                return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+            }
+        }
+        // 좋아요 수 취소를 원하는 경우
+        else if(recommend.getLikes().equals("N")) {
+            if(history!=null && history.getLikes().equals("Y")){
+                userService.updateUserRecommend(recommend);
+                discussionService.updateDiscussionLikes(targetCode, 0);
+                return new ResponseEntity<>(HttpStatus.CREATED);
+            }
+            else {
+                String result = "좋아요 기록이 없으므로 취소 불가";
+                return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+            }
+        }
+        String result = "요청값을 다시 확인바람";
+        return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+    }
 
 }

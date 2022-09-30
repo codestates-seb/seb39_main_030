@@ -24,4 +24,13 @@ public class UpdateUserRequestDto {
     @Pattern(regexp = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$")
     private String kakaoEmail;
 
+    @NotBlank
+    private String tag1;
+
+    @NotBlank
+    private String tag2;
+
+    @NotBlank
+    private String tag3;
+
 }
