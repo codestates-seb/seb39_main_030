@@ -75,6 +75,7 @@ public class DeclarationController {
                     .userCode(d.getUser().getUserCode())
                     .nickname(d.getUser().getNickname())
                     .profileImg(d.getUser().getProfileImg())
+                    .declarationClear(d.getDeclarationClear())
                     .build();
             result.add(responseDto);
         }

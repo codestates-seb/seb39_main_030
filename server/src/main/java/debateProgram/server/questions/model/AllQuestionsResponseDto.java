@@ -13,5 +13,6 @@ public class AllQuestionsResponseDto {
     private int userCode;
     private String nickname;
     private String profileImg;
+    private String questionClear;
 
 }
