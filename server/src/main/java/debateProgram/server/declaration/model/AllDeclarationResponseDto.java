@@ -12,5 +12,6 @@ public class AllDeclarationResponseDto {
     private int userCode;
     private String nickname;
     private String profileImg;
+    private String declarationClear;
 
 }

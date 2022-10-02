@@ -64,6 +64,7 @@ public class QuestionsController {
                     .userCode(q.getUser().getUserCode())
                     .nickname(q.getUser().getNickname())
                     .profileImg(q.getUser().getProfileImg())
+                    .questionClear(q.getQuestionClear())
                     .build();
             result.add(responseDto);
         }
