@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public interface DeclarationsDto {
 
     int getDeclarationCode();
-    String getDDeclarationReason();
+    String getDeclarationReason();
     LocalDateTime getDeclarationCreateDate();
 
 }
