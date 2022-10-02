@@ -76,6 +76,7 @@ public class DeclarationController {
                     .nickname(d.getUser().getNickname())
                     .profileImg(d.getUser().getProfileImg())
                     .declarationClear(d.getDeclarationClear())
+                    .declarationCreateDate(d.getDeclarationCreateDate())
                     .build();
             result.add(responseDto);
         }
