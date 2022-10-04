@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,7 +89,7 @@ public class DeclarationController {
      * 신고 게시글 생성 API
      */
     @PostMapping
-    public ResponseEntity postDeclaration(@RequestBody PostDeclarationRequestDto requestDto) {
+    public ResponseEntity postDeclaration(@Valid @RequestBody PostDeclarationRequestDto requestDto) {
         Declaration declaration = declarationMapper.postRequestToDeclaration(requestDto);
         PostDeclarationResponseDto result = declarationService.crateDeclaration(declaration);
 
@@ -119,7 +120,7 @@ public class DeclarationController {
      * 관리자의 신고 처리 API
      */
     @PostMapping("/feedback")
-    public ResponseEntity declarationFeedback(@RequestBody AdminFeedbackRequestDto dto) {
+    public ResponseEntity declarationFeedback(@Valid @RequestBody AdminFeedbackRequestDto dto) {
         String userRole = userService.findVerifiedUser(dto.getUserCode()).getUserRole();
 
         if (userRole.equals("ROLE_ADMIN")) {

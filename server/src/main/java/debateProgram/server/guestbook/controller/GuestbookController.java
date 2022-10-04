@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -39,7 +40,7 @@ public class GuestbookController {
      * 방명록 생성 API
      */
     @PostMapping
-    public ResponseEntity createGuestbook(@RequestBody WriteGuestbookRequestDto requestDto){
+    public ResponseEntity createGuestbook(@Valid @RequestBody WriteGuestbookRequestDto requestDto){
         Guestbook guestbook = guestbookMapper.writeRequestToGuestbook(requestDto);
         Guestbook savedBook = guestbookService.writeGuestBook(guestbook);
 
@@ -67,7 +68,7 @@ public class GuestbookController {
      * 방명록 수정 API
      */
     @PostMapping("/update")
-    public ResponseEntity updateGuestbook(@RequestBody UpdateGuestbookRequestDto dto) {
+    public ResponseEntity updateGuestbook(@Valid @RequestBody UpdateGuestbookRequestDto dto) {
         int userCode = guestbookService.findVerifiedGuestBook(dto.getBookCode()).getGuestCode();
 
         if (dto.getUserCode() == userCode) {
