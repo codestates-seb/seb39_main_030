@@ -27,7 +27,6 @@ yarn-error.log*
 
 
 # IntelliJ project files
-.idea
 .idea/*
 .xml*
 .iml
@@ -35,7 +34,6 @@ out
 gen
 build
 rebel.xml.DS_Store
-.DS_Store
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
