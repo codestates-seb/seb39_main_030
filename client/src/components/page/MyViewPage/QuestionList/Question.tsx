@@ -8,7 +8,7 @@ export default function Question(props: any) {
   const navigate = useNavigate();
 
   const onClickQuestion = () => {
-    navigate(`/myview/${props.questionCode}`, {
+    navigate(`/myview/question/${props.questionCode}`, {
       state: props,
     });
   };
@@ -34,6 +34,10 @@ export default function Question(props: any) {
 const StyledQuestion = styled.div`
   display: flex;
   min-height: 70px;
+  cursor: pointer;
+  ${Text} {
+    cursor: pointer;
+  }
 
   border-bottom: solid 1px;
   justify-content: space-between;
