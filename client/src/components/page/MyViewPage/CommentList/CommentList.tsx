@@ -9,6 +9,7 @@ export default function CommentList() {
   const [commentList, setCommentList] = useState<any>([]);
   const [userImg, setUserImg] = useState<string>();
   const user = getStoredUser();
+  console.log(commentList);
 
   const userCode = user.userCode;
   const params = { userCode };

@@ -35,6 +35,12 @@ const StyledContact = styled.div`
   align-items: center;
   padding: 0 1rem;
 
+  cursor: pointer;
+
+  ${Text} {
+    cursor: pointer;
+  }
+
   ${media.custom('768px')} {
     padding: 1rem;
     flex-direction: column;
