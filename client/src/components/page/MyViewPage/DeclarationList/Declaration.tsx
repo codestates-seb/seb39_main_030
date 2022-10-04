@@ -7,14 +7,14 @@ export default function Declaration(props: any) {
   const navigate = useNavigate();
 
   const onClickContactItem = () => {
-    ///contact-list/:questionCode
-    navigate(`/myview/${props.declarationCode}}`, {
+    console.log(props);
+    navigate(`/myview/declaration/${props.declarationCode}`, {
       state: props,
     });
   };
 
   return (
-    <StyledDeclaration>
+    <StyledDeclaration onClick={onClickContactItem}>
       <img className="img" src={props.profileImg} />
       <Text className="declarationTitle " fontSize="lg">
         {props.ddeclarationReason}
@@ -34,6 +34,11 @@ const StyledDeclaration = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 0 1rem;
+  cursor: pointer;
+
+  ${Text} {
+    cursor: pointer;
+  }
 
   .declarationTitle {
     margin-right: auto;

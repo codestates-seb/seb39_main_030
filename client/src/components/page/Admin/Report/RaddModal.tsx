@@ -19,6 +19,7 @@ const RaddModal = ({
 }) => {
   const navigate = useNavigate();
   const addModalHandler = async () => {
+    console.log(userCode, declarationCode, declarationAnswer);
     await axiosInstance
       .post('/declaration/feedback', {
         declarationCode: declarationCode,

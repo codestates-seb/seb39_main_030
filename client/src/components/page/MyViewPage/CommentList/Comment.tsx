@@ -27,6 +27,11 @@ const StyledContact = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 0 1rem;
+  cursor: pointer;
+
+  ${Text} {
+    cursor: pointer;
+  }
 
   ${media.custom('768px')} {
     padding: 1rem;
