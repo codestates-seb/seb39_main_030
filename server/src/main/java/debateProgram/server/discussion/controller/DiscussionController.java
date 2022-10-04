@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class DiscussionController {
      * 토론글 생성 API
      */
     @PostMapping
-    public ResponseEntity postDiscussion(@RequestBody PostDiscussionRequestDto postDiscussionRequestDto) {
+    public ResponseEntity postDiscussion(@Valid @RequestBody PostDiscussionRequestDto postDiscussionRequestDto) {
         Discussion discussion = discussionMapper.postRequestToDiscussion(postDiscussionRequestDto);
         Discussion response = discussionService.createDiscussion(discussion);
 
@@ -140,7 +141,7 @@ public class DiscussionController {
      * 토론글 수정 API
      */
     @PostMapping("/update")
-    public ResponseEntity updateDiscussion(@RequestBody UpdateDiscussionRequestDto requestDto) {
+    public ResponseEntity updateDiscussion(@Valid @RequestBody UpdateDiscussionRequestDto requestDto) {
         Discussion details = discussionService.findVerifiedDiscussion(requestDto.getDiscussionCode());
         int writerCode = details.getUserCode();
 

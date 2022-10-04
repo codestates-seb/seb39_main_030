@@ -4,15 +4,16 @@ import lombok.Builder;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Builder
 public class UpdateCommentRequestDto {
 
-    @NotBlank
+    @NotNull
     private int commentCode;
 
-    @NotBlank
+    @NotNull
     private int userCode;
 
     @NotBlank
