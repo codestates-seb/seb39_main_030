@@ -25,6 +25,9 @@ const QuestionDetail = lazy(
 
 const UpdateSocket = lazy(() => import('../../auth/UpdateSocket'));
 const VideoPage = lazy(() => import('../page/VideoChat/VideoPage'));
+const DeclarationDetail = lazy(
+  () => import('../page/MyViewPage/DeclarationList/DeclarationDetail')
+);
 
 const RouteList = () => {
   return (
@@ -51,8 +54,12 @@ const RouteList = () => {
         <Route path="/mypage" element={<MyPage />}></Route>
         <Route path="/myview" element={<MyViewPage />}></Route>
         <Route
-          path="/myview/:questionCode"
+          path="/myview/question/:questionCode"
           element={<QuestionDetail />}
+        ></Route>
+        <Route
+          path="/myview/declaration/:declarationCode"
+          element={<DeclarationDetail />}
         ></Route>
         <Route path="/video" element={<VideoPage />}></Route>
       </Routes>

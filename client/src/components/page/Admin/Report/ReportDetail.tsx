@@ -2,7 +2,7 @@ import { axiosInstance } from '../../../../axiosInstance';
 import useModal from '../../../app/hooks/useModal';
 import Button from '../../../atom/Button';
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { Text } from '../../../atom/Text';
 import { getKST } from '../../../app/util';
@@ -15,15 +15,6 @@ export default function ReportDetail() {
   const { declarationCode, userCode }: any = useParams();
 
   const navigate = useNavigate();
-
-  const location = useLocation();
-
-  interface IType {
-    func: any;
-  }
-  const data = location.state as IType;
-
-  console.log(data);
 
   const params = {
     declarationCode,
@@ -45,7 +36,7 @@ export default function ReportDetail() {
       props: {
         declarationCode: reportData.declarationCode,
         userCode: reportData.userCode,
-        declarationAnswer: reportData.declarationAnswer,
+        declarationAnswer: answerContent,
       },
     });
   };
