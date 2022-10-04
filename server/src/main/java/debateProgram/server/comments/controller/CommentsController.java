@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 /**
  * 댓글
  */
@@ -33,7 +35,7 @@ public class CommentsController {
      * 댓글 생성 API
      */
     @PostMapping
-    public ResponseEntity postComment(@RequestBody PostCommentsRequestDto requestDto) {
+    public ResponseEntity postComment(@Valid @RequestBody PostCommentsRequestDto requestDto) {
         Comments comments = commentsMapper.postRequestToComments(requestDto);
         Comments newComment = commentsService.creatComment(comments);
 
@@ -65,7 +67,7 @@ public class CommentsController {
      */
     @PostMapping("/update")
     public ResponseEntity updateComment(@RequestParam("userCode") int userCode,
-                                        @RequestBody UpdateCommentRequestDto requestDto) {
+                                        @Valid @RequestBody UpdateCommentRequestDto requestDto) {
         Comments commentDetails = commentsService.findVerifiedComment(requestDto.getCommentCode());
         int writerCode = commentDetails.getUserCode();
 

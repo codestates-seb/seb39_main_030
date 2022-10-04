@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class QuestionsController {
      * 문의글 생성 API
      */
     @PostMapping
-    public ResponseEntity createQuestion(@RequestBody CreateQuestionRequestDto requestDto) {
+    public ResponseEntity createQuestion(@Valid @RequestBody CreateQuestionRequestDto requestDto) {
         Questions question = questionsMapper.createRequestToQuestion(requestDto);
         CreateQuestionResponseDto savedQ = questionsService.createQuestion(question);
 
@@ -117,7 +118,7 @@ public class QuestionsController {
      * 관리자의 문의 처리 API
      */
     @PostMapping("/review")
-    public ResponseEntity questionReview(@RequestBody AdminReviewRequestDto requestDto) {
+    public ResponseEntity questionReview(@Valid @RequestBody AdminReviewRequestDto requestDto) {
         User user = userService.findVerifiedUser(requestDto.getUserCode());
 
         if (!user.getUserRole().equals("ROLE_ADMIN")) {

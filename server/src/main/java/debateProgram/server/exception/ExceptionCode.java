@@ -23,11 +23,6 @@ public enum ExceptionCode {
     RECOMMEND_CODE_EXISTS(409, "Recommend Code exists");
 
 
-//    ORDER_NOT_FOUND(404, "Order not found"),
-//    CANNOT_CHANGE_ORDER(403, "Order can not change"),
-//    NOT_IMPLEMENTATION(501, "Not Implementation"),
-//    INVALID_MEMBER_STATUS(400, "Invalid member status");
-
     @Getter
     private int status;
 

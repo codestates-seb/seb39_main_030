@@ -4,15 +4,16 @@ import lombok.Builder;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Builder
 public class PostDeclarationRequestDto {
 
-    @NotBlank
+    @NotNull
     private int userCode;
 
-    @NotBlank
+    @NotNull
     private int discussionCode;
 
     @NotBlank
