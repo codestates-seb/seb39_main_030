@@ -67,7 +67,7 @@ const discussionTag = [
   '기타',
 ];
 
-const userState = [true, false];
+const userState = ['Y', 'N'];
 
 function rand(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -76,6 +76,7 @@ function rand(min, max) {
 const genObj = (num) => {
   return {
     discussionCode: num,
+    userCode: num,
     nickname: nickname[rand(0, nickname.length - 1)],
     discussionCreateDate: '2022-07-29',
     discussionTitle: discussionTitle[rand(0, discussionTitle.length - 1)],
@@ -90,7 +91,23 @@ const genObj = (num) => {
   };
 };
 
-export const mockDebateList = [];
+export const mockDebateList = [
+  {
+    discussionCode: 0,
+    userCode: 21,
+    nickname: '지영준',
+    discussionCreateDate: '2022-07-29',
+    discussionTitle: '테스트용',
+    discussionContents:
+      '내용이 여기 잔뜩 들어있을 것이다 동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세',
+    discussionCategory: '예술',
+    discussionTag: '정당',
+    discussionLikes: discussionCode[rand(0, 99)],
+    profileImg:
+      'http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg',
+    userState: 'Y',
+  },
+];
 
 for (const num of discussionCode) {
   mockDebateList.push(genObj(Number(num)));

@@ -1,7 +1,6 @@
-import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { axiosInstance } from '../axiosInstance';
 import { useAuth } from './useAuth';
+import Loading from '../components/app/Loading';
 
 const Oauth = () => {
   const { signIn } = useAuth();
@@ -9,13 +8,16 @@ const Oauth = () => {
   useEffect(() => {
     const code = new URL(window.location.href).searchParams.get('code');
     if (window.localStorage.getItem('code') !== code) {
-      console.log(code);
       window.localStorage.setItem('code', code);
       signIn(code);
     }
   }, []);
 
-  return <></>;
+  return (
+    <div>
+      <Loading sub={false} />
+    </div>
+  );
 };
 
 export default Oauth;

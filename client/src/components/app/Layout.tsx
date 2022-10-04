@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
 import Header from '../block/Header';
@@ -9,10 +9,11 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import SearchBar from '../block/SearchBar';
 import 'react-toastify/dist/ReactToastify.css';
+import { openModal } from '../../store/uiSlice/modal-slice';
 
 export const basicToastOption = {
   autoClose: 2000,
-  hideProgressBar: false,
+  hideProgressBar: true,
   closeOnClick: true,
   pauseOnHover: true,
   draggable: true,

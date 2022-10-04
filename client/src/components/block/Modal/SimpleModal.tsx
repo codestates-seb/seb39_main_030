@@ -1,5 +1,4 @@
 import Modal from './Modal';
-import useModal from '../../app/hooks/useModal';
 import { Text } from '../../atom/Text';
 import styled from 'styled-components';
 
