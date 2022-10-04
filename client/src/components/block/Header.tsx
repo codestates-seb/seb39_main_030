@@ -1,43 +1,147 @@
 import styled from 'styled-components';
 import { RootState } from '../../store';
 import { useDispatch, useSelector } from 'react-redux';
+import { SearchMenuActions } from '../../store/uiSlice/SearchMenu-slice';
+
+import { TbSearch } from 'react-icons/tb';
+import { FiLogIn } from 'react-icons/fi';
+import { FiLogOut } from 'react-icons/fi';
+import { BiUser } from 'react-icons/bi';
+import { TiDocumentText } from 'react-icons/ti';
+import { GiDiscussion } from 'react-icons/gi';
+import { TbZoomCancel } from 'react-icons/tb';
 
 import { media } from '../../style/media';
 import { Text } from '../atom/Text';
 import DarkModeButton from '../atom/DarkModeButton';
 import HamburgerMenu from '../atom/HamburgerMenu';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import useModal from '../app/hooks/useModal';
+import { useRef, useState } from 'react';
+import useOutSideClick from '../app/hooks/useOutSideClick';
 
 const Header = () => {
+  const [showProfile, setShowProfile] = useState<boolean>();
+  const navigate = useNavigate();
+  const userProfileRef = useRef();
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.user.userInfo);
+
   const searchOpen = useSelector(
     (state: RootState) => state.searchMenu.clicked
   );
 
-  const menuItem = [
-    { name: '토론 열기', path: '/add-debate' },
-    { name: '로그인', path: '/login' },
-  ].map((menu, idx) => (
-    <li key={idx} className="menu">
-      <NavStyle to={menu.path}>{menu.name}</NavStyle>
-    </li>
-  ));
+  const searchButtonHandler = () => {
+    dispatch(SearchMenuActions.change());
+  };
+
+  const { openModal } = useModal();
+
+  const openLoginHandler = () => {
+    openModal({ type: 'login' });
+  };
+
+  const openLogoutHandler = () => {
+    closeProfileHandler();
+    openModal({ type: 'logout' });
+  };
+
+  const openProfileHandler = () => {
+    setShowProfile(!showProfile);
+  };
+
+  const closeProfileHandler = () => {
+    setShowProfile(false);
+  };
+
+  const linkMyPageHandler = () => {
+    setShowProfile(false);
+    navigate('/mypage');
+  };
+
+  const linkMyViewHandler = () => {
+    setShowProfile(false);
+    navigate('/myview');
+  };
+
+  useOutSideClick(
+    userProfileRef,
+    showProfile
+      ? closeProfileHandler
+      : () => {
+          return;
+        }
+  );
 
   return (
-    <StyledHeader open={searchOpen}>
+    <StyledHeader searchOpen={searchOpen} userProfileOpen={showProfile}>
       <div className="HamburgerMenu">
         <HamburgerMenu />
+      </div>
+      <div className="DarkModeButton">
+        <DarkModeButton />
       </div>
       <NavLink to="/">
         <Text className="logo" fontSize="xl" fontWeight="bold">
           와글와글
         </Text>
       </NavLink>
+      <NavLink className="logoIcon" to="/">
+        <GiDiscussion />
+      </NavLink>
       <nav>
         <ul>
-          {menuItem}
-          <li>
+          {user && (
+            <li className="menu">
+              <NavStyle to="/add-debate">토론생성</NavStyle>
+            </li>
+          )}
+          {user && (
+            <li className="menu">
+              <NavStyle to="/admin-contact">문의하기</NavStyle>
+            </li>
+          )}
+          {user?.userRole === 'ROLE_ADMIN' && (
+            <li className="menu">
+              <NavStyle to="/admin">⚙️ 관리자</NavStyle>
+            </li>
+          )}
+          <li className="search-menu">
+            <TbSearch className="search" onClick={searchButtonHandler} />
+            <TbZoomCancel className="close" onClick={searchButtonHandler} />
+          </li>
+          <li className="dark-mode--desktop">
             <DarkModeButton />
           </li>
+          {user && (
+            <li ref={userProfileRef}>
+              <img
+                onClick={openProfileHandler}
+                className="userProfile"
+                src={user.profileImg}
+                alt="유저프로필"
+              />
+              <div className="userProfileInfo">
+                <ul>
+                  <li onClick={linkMyPageHandler}>
+                    <BiUser />내 정보
+                  </li>
+                  <li onClick={linkMyViewHandler}>
+                    <TiDocumentText />
+                    내가 쓴 글
+                  </li>
+                  <li className="fi-logout" onClick={openLogoutHandler}>
+                    <FiLogOut /> 로그아웃
+                  </li>
+                </ul>
+              </div>
+            </li>
+          )}
+          {!user && (
+            <li className="login" onClick={openLoginHandler}>
+              <FiLogIn />
+            </li>
+          )}
         </ul>
       </nav>
     </StyledHeader>
@@ -46,7 +150,10 @@ const Header = () => {
 
 export default Header;
 
-const StyledHeader = styled.header<{ open: boolean }>`
+const StyledHeader = styled.header<{
+  searchOpen: boolean;
+  userProfileOpen: boolean;
+}>`
   position: fixed;
   top: 0;
   left: 0;
@@ -57,7 +164,82 @@ const StyledHeader = styled.header<{ open: boolean }>`
   justify-content: space-between;
   align-items: center;
   border-bottom: ${({ theme }) => `1px solid ${theme.mode.divider}`};
+  z-index: 9000;
 
+  .userProfileInfo {
+    position: absolute;
+    top: 90%;
+    right: 10px;
+    border: 2px solid ${({ theme }) => theme.mode.themeIcon};
+    background-color: ${({ theme }) => theme.mode.mainBackground};
+    border-radius: 5px;
+    visibility: ${(props) => (props.userProfileOpen ? 'visible' : 'hidden')};
+    opacity: ${(props) => (props.userProfileOpen ? '1' : '0')};
+    transition: all 0.3s;
+
+    ul {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px;
+      margin-top: 5px;
+      .fi-logout {
+        margin-left: 18px;
+      }
+    }
+
+    li {
+      cursor: pointer;
+      margin: 10px 15px;
+      display: flex;
+      align-items: center;
+      color: ${({ theme }) => theme.mode.primaryText};
+      font-weight: ${({ theme }) => theme.fontWeights.semiBold};
+      svg {
+        margin-bottom: 5px;
+        margin-right: 10px;
+        width: 25px;
+        height: 25px;
+      }
+    }
+  }
+
+  .userProfileInfo::after {
+    content: '';
+    border-top: 9px solid transparent;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 10px solid ${({ theme }) => theme.mode.mainBackground};
+    position: absolute;
+    top: -16px;
+    left: 121px;
+  }
+
+  .userProfileInfo::before {
+    content: '';
+    position: absolute;
+    border-top: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-left: 8px solid transparent;
+    border-bottom: 10px solid ${({ theme }) => theme.mode.themeIcon};
+    top: -18px;
+    left: 121px;
+  }
+
+  .dark-mode--desktop {
+    ${media.custom('768px')} {
+      display: none;
+    }
+  }
+
+  .userProfile {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    margin-top: 4px;
+    cursor: pointer;
+    box-shadow: 0 0 15px ${({ theme }) => theme.mode.searchBar};
+  }
   a:link,
   a:visited {
     text-decoration: none;
@@ -74,6 +256,22 @@ const StyledHeader = styled.header<{ open: boolean }>`
     }
   }
 
+  .logoIcon {
+    position: absolute;
+    left: 48%;
+    top: 25%;
+    display: none;
+    cursor: pointer;
+    svg {
+      color: ${({ theme }) => theme.mode.themeIcon};
+      width: 30px;
+      height: 30px;
+    }
+    ${media.custom('768px')} {
+      display: block;
+    }
+  }
+
   .logo:hover,
   .logo:active {
     color: rgb(198, 198, 203);
@@ -87,9 +285,22 @@ const StyledHeader = styled.header<{ open: boolean }>`
     }
   }
 
+  .DarkModeButton {
+    display: none;
+    margin-left: 2rem;
+    ${media.custom('768px')} {
+      display: block;
+      margin-right: auto;
+      margin-top: 2px;
+    }
+  }
+
   .menu {
     display: block;
     margin-top: 2px;
+    color: ${({ theme }) => theme.mode.primaryText};
+    font-weight: ${({ theme }) => theme.fontWeights.semiBold};
+    cursor: pointer;
 
     ${media.custom('768px')} {
       display: none;
@@ -106,6 +317,27 @@ const StyledHeader = styled.header<{ open: boolean }>`
 
   li {
     margin: 0 1rem;
+  }
+
+  .search-menu,
+  .login,
+  .logout {
+    margin-left: 1rem;
+
+    svg {
+      color: ${({ theme }) => theme.mode.themeIcon};
+      height: 27px;
+      width: 27px;
+      cursor: pointer;
+    }
+
+    .search {
+      display: ${(props) => (props.searchOpen ? 'none' : 'block')};
+    }
+
+    .close {
+      display: ${(props) => (props.searchOpen ? 'block' : 'none')};
+    }
   }
 `;
 

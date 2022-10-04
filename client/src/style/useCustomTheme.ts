@@ -8,17 +8,18 @@ const dark = {
   secondaryText: 'rgba(255,255,255,0.45)',
   disable: 'rgba(255,255,255,0.25)',
   border: '#d1d5da',
-  divider: '#383d42',
+  divider: '#5a5a5a',
   background: '#1d1d1f',
-  backgroundSub: '#575757',
+  backgroundSub: '#3a3a3a',
   tableHeader: 'rgba(255,255,255,0.02)',
-  themeIcon: '#FBE302',
-  searchBar: 'rgba(251,227,2,0.8)',
+  themeIcon: '#ffffff',
+  searchBar: 'rgba(255,255,255,0.7)',
   // button-color
   defaultButtonColor: '#ffffff',
-  defaultButtonBackground: '#263970',
+  defaultButtonBackground: '#202020',
   // point-color
-  hover: '#38446c',
+  hover: '#7CACF8',
+  hoverBackground: '#2a2727',
 };
 
 const light = {
@@ -38,7 +39,8 @@ const light = {
   defaultButtonColor: '#4169e1',
   defaultButtonBackground: '#ffffff',
   // point-color
-  hover: '#e5e7ee',
+  hover: '#4169e1',
+  hoverBackground: 'rgb(245,245,245)',
 };
 
 const fontSizes = {

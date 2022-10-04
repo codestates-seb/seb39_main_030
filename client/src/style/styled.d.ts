@@ -19,6 +19,7 @@ declare module 'styled-components' {
       defaultButtonBackground: string;
       // point-color
       hover: string;
+      hoverBackground: string;
       [key: string]: any;
       // TODO: 객체에 string 으로 접근 시 에러 방지를 위한 조치
     };

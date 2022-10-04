@@ -23,7 +23,7 @@ const Button = styled.button<IButton>`
   pointer-events: ${({ disabled }) => (disabled ? 'none' : 'auto')};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   opacity: ${({ disabled }) => (disabled ? 0.3 : 1)};
-  border-radius: 10px;
+  border-radius: 20px;
   border: 1px solid
     ${({ theme, borderColor }) =>
       (borderColor && theme.mode[borderColor]) ||
@@ -34,8 +34,9 @@ const Button = styled.button<IButton>`
 
   &:hover,
   &:active {
-    background: ${({ theme }) => theme.mode.hover};
-    border-color: ${({ theme }) => theme.mode.hover};
+    border: 1px solid ${({ theme }) => theme.mode.hover};
+    color: ${({ theme }) => theme.mode.hover};
+    background-color: ${({ theme }) => theme.mode.hoverBackground};
   }
 `;
 
