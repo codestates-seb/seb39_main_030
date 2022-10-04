@@ -79,7 +79,9 @@ const DebateMain = ({ debate, getKST }) => {
   const moveVideoPage = () => {
     socket.emit('requestFight', {
       targetUserCode: debate?.userCode.toString(),
+      // TODO 로컬에서 테스트 할 때, temp로 변경
       userCode: user.userCode.toString(),
+      // userCode: user.temp.toString(),
     });
 
     navigate('/video');
