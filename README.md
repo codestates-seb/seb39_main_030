@@ -17,7 +17,9 @@
 
 https://user-images.githubusercontent.com/102160859/193757123-94c61816-0b82-4309-bb7f-8ae3573f1b67.mp4
 
+<br>
 
+![토론게시글기능](https://user-images.githubusercontent.com/87750478/194079941-d5f88920-8a37-4c13-a795-0cec3f5cee79.gif)
 
 <br>
 
@@ -29,7 +31,6 @@ https://user-images.githubusercontent.com/102160859/193757123-94c61816-0b82-4309
 |[지영준](https://github.com/JiYJ725)|[한상준](https://github.com/HANSANGJUN)|[강다교](https://github.com/kyodkyo)|[최진아](https://github.com/jina0120)  |
 <br>
 
-![토론게시글기능](https://user-images.githubusercontent.com/87750478/194079941-d5f88920-8a37-4c13-a795-0cec3f5cee79.gif)
 
 ### 📂 프로젝트 관련 문서
 
