@@ -37,6 +37,7 @@ https://user-images.githubusercontent.com/102160859/193757123-94c61816-0b82-4309
 ```
 프로젝트 관련 문서를 노션에 정리해 두었습니다
 ```
+[📌 프로젝트 발표 문서](https://www.notion.so/codestates/39-Team-713720fea69b4781a2592f8c8636a31e)
 
 [📑 프로젝트 기획서](https://scratched-skateboard-57f.notion.site/e9f42982388342228d551a148425f89b)
 
