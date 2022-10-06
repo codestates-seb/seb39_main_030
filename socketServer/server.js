@@ -1,16 +1,17 @@
 const express = require("express");
-const https = require("https");
+const http = require("http");
 const cli = require("nodemon/lib/cli");
 const app = express();
 const fs = require('fs');
 
-const privateKey = fs.readFileSync(__dirname + '/key.pem', 'utf8');
-const certificate = fs.readFileSync(__dirname + '/cert.pem', 'utf8');
-const credentials = {
-  key: privateKey,
-  cert: certificate,
+const KEY_URL="etc/letsencrypt/live/team30/kro.kr";
+const options = {
+  key: fs.readFileSync(`${KEY_URL}/privkey.pem`),
+  cert: fs.readFileSync(`${KEY_URL}/cert.pem`),
+  ca: fs.readFileSync(`${KEY_URL}/chain.pem`),
 };
-const server = https.createServer(credentials, app);
+
+const server = http.createServer(options, app);
 const io = require("socket.io")(server, {
   cors: {
     origin: "*",
@@ -19,12 +20,19 @@ const io = require("socket.io")(server, {
 });
 
 
-const HTTPS_PORT = process.env.PORT || 5002;
+const HTTPS_PORT = process.env.PORT || 8080;
 
 const client = [];
 const VideoID = [];
 
 const allSocket = {};
+app.get("/test", function (req, res) {
+  res.send("test");
+})
+
+app.get("/", function (req,res) {
+  res.status(201).send("root");
+})
 
 io.on("connection", (socket) => {
   //화상채팅
@@ -68,4 +76,5 @@ io.on("connection", (socket) => {
     io.to(data.to).emit("callAccepted", data.signal);
   });
 });
+
 server.listen(HTTPS_PORT, () => console.log(`🚀 HTTPS Server is starting on ${HTTPS_PORT}`));
