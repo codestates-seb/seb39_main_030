@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import Card from '../../atom/Card';
-import { Text } from '../../atom/Text';
+import Card from '../../../atom/Card';
+import { Text } from '../../../atom/Text';
 import { AiFillLike } from 'react-icons/ai';
 
 interface Props {
@@ -10,16 +10,17 @@ interface Props {
   discussionTag: string;
   discussionLikes: number;
   profileImg: string;
-  userState: boolean;
+  userState: string;
 }
 
 const Debate = (props: Props) => {
   const makeContents = (contents: string) => {
     if (contents.length > 35) {
-      return contents.slice(0, 40) + '...';
+      return contents.slice(0, 40) + ' ...';
     }
     return contents;
   };
+
   return (
     <StyledDebate>
       <div className="debate-title-container">
@@ -39,7 +40,7 @@ const Debate = (props: Props) => {
       <div className="debate-bottom">
         <img className="debate-profile" src={props.profileImg} />
         <Text className="debate-nickname">{props.nickname}</Text>
-        {props.userState ? (
+        {props.userState === 'Y' ? (
           <Text fontSize="sm" className="list-online">
             ONLINE
           </Text>
@@ -65,7 +66,10 @@ const StyledDebate = styled(Card)`
 
   .list-online {
     border: 1px solid #5ecc5e;
-    padding: 6px 8px 2px 10px;
+    height: 25px;
+    width: 4rem;
+    text-align: center;
+    line-height: 25px;
     border-radius: 30px;
     color: #5ecc5e;
     margin-left: auto;
@@ -74,7 +78,10 @@ const StyledDebate = styled(Card)`
 
   .list-offline {
     border: 1px solid #da3030;
-    padding: 6px 9px 2px 9px;
+    height: 25px;
+    width: 4rem;
+    text-align: center;
+    line-height: 25px;
     border-radius: 30px;
     color: #da3030;
     margin-left: auto;
@@ -97,7 +104,7 @@ const StyledDebate = styled(Card)`
     margin-top: 2rem;
   }
 
-  hr {
+  & hr {
     margin-top: 1rem;
     margin-bottom: 1rem;
     border: 0;

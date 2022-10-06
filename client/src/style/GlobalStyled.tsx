@@ -7,10 +7,15 @@ const GlobalStyled = createGlobalStyle`
   *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
+    font-family: 'Apple SD Gothic Neo','Malgun Gothic',arial,sans-serif;
+    -webkit-user-drag: none;
+  }
+  html::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
   }
   
   body {
-    font-family: sans-serif;
+    font-family: 'Apple SD Gothic Neo','Malgun Gothic',arial,sans-serif;
     background: ${({ theme }) => theme.mode.mainBackground};
     transition: all 0.2s;
   }

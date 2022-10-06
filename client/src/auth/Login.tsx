@@ -4,9 +4,9 @@ import Modal from '../components/block/Modal/Modal';
 import { Text } from '../components/atom/Text';
 
 const REST_API_KEY = process.env.REACT_APP_REST_API_KEY;
-const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URL;
+const REDIRECT_URL = process.env.REACT_APP_REDIRECT_URL;
 
-const KAKAO_AUTH_URI = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+const KAKAO_AUTH_URI = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URL}&response_type=code`;
 
 const Login = ({ onClose }) => {
   return (

@@ -1,13 +1,14 @@
 import styled from 'styled-components';
-import Card from '../../atom/Card';
+import Card from '../../../atom/Card';
 import Debate from './Debate';
-import { Text } from '../../atom/Text';
+import { Text } from '../../../atom/Text';
 
-import useDebateList from './hooks/useDebateList';
+import useDebateList from '../hooks/useDebateList';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../store';
+import { RootState } from '../../../../store';
 import { useLayoutEffect } from 'react';
+import InfiniteDebateList from './InfiniteDebateList';
 
 const DebateList = () => {
   const {
@@ -41,6 +42,14 @@ const DebateList = () => {
     };
   }, [searchSignal, params.searchWord, curTag, toggleState]);
 
+  if (
+    searchWord === 'all#@!' &&
+    currentTag === 'all#@!' &&
+    process.env.REACT_APP_MOCK !== '1'
+  ) {
+    return <InfiniteDebateList />;
+  }
+
   return (
     <StyledDebateList>
       {searchWord !== 'all#@!' && currentTag === 'all#@!' && (
@@ -49,12 +58,12 @@ const DebateList = () => {
           검색되었습니다.
         </Text>
       )}
-      {debateList.length === 0 && currentTag !== 'all#@!' && (
+      {debateList?.length === 0 && currentTag !== 'all#@!' && (
         <Text className="search-result" fontWeight="semiBold">
           {`${currentTag}에 대한 토론이 존재하지 않습니다.`}
         </Text>
       )}
-      {debateList.map((debate) => (
+      {debateList?.map((debate) => (
         <Link
           key={debate.discussionCode}
           to={`/debate/${debate.discussionCode}`}

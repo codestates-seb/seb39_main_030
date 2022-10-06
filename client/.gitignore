@@ -14,6 +14,7 @@
 # misc
 .DS_Store
 .env.local
+.env.development
 .env.development.local
 .env.test.local
 .env.production.local
@@ -26,7 +27,6 @@ yarn-error.log*
 
 
 # IntelliJ project files
-.idea
 .idea/*
 .xml*
 .iml
@@ -34,7 +34,6 @@ out
 gen
 build
 rebel.xml.DS_Store
-.DS_Store
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
