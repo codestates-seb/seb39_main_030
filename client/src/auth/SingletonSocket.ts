@@ -16,5 +16,5 @@ const Singleton = {
   },
 };
 
-const singleInstance = Singleton.getInstance('https://localhost:5002');
+const singleInstance = Singleton.getInstance('https://team30.kro.kr:8080');
 export const socket = singleInstance.io;
