@@ -2,20 +2,27 @@ package debateProgram.server.user.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import debateProgram.server.comments.repository.CommentsRepository;
+import debateProgram.server.declaration.repository.DeclarationRepository;
+import debateProgram.server.discussion.repository.DiscussionRepository;
 import debateProgram.server.exception.BusinessLogicException;
 import debateProgram.server.exception.ExceptionCode;
+import debateProgram.server.guestbook.repository.GuestbookRepository;
+import debateProgram.server.questions.repository.QuestionsRepository;
+import debateProgram.server.user.recommend.Recommend;
 import debateProgram.server.user.entity.User;
-import debateProgram.server.user.model.KakaoProfile;
-import debateProgram.server.user.model.OauthToken;
-import debateProgram.server.user.model.UpdateUserRequestDto;
+import debateProgram.server.user.model.*;
+import debateProgram.server.user.model.AllListsInterface.CommentsDto;
+import debateProgram.server.user.model.AllListsInterface.DeclarationsDto;
+import debateProgram.server.user.model.AllListsInterface.DiscussionsDto;
+import debateProgram.server.user.model.AllListsInterface.QuestionsDto;
+import debateProgram.server.user.recommend.RecommendRepository;
 import debateProgram.server.user.repository.UserRepository;
+import debateProgram.server.user.tags.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +30,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -39,6 +47,21 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final DiscussionRepository discussionRepository;
+
+    private final CommentsRepository commentsRepository;
+
+    private final QuestionsRepository questionsRepository;
+
+    private final DeclarationRepository declarationRepository;
+
+    private final GuestbookRepository guestbookRepository;
+
+    private final RecommendRepository recommendRepository;
+
+    private final TagsRepository tagsRepository;
+
+
     public OauthToken getAccessToken(String code) {
 
         RestTemplate restTemplate = new RestTemplate();
@@ -51,7 +74,7 @@ public class UserService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", client_id);
-        params.add("redirect_uri", "http://localhost:3000/auth");
+        params.add("redirect_uri", "http://pre-project-team30.s3-website.ap-northeast-2.amazonaws.com/auth");
         params.add("code", code);
         params.add("client_secret", client_secret);
 
@@ -99,9 +122,12 @@ public class UserService {
                     .userRole("ROLE_USER")
                     .userState("Y")
                     .build();
-
             userRepository.save(user);
-        } else {
+        }
+        else {
+            userRepository.updateProfile(user.getUserCode(),
+                    profile.getKakao_account().getProfile().getProfile_image_url(),
+                    profile.getKakao_account().getEmail());
             userRepository.updateUserState(user.getUserCode(), "Y");
         }
 
@@ -157,12 +183,36 @@ public class UserService {
         return findUser;
     }
 
+    public UpdateUserResponseDto findUserInfo(int userCode) {
+        User user = findVerifiedUser(userCode);
+        UserTags tagList = tagsRepository.findByUserCode(userCode);
 
-    public User updateUserInfo(UpdateUserRequestDto dto) {
+        UpdateUserResponseDto dto = UpdateUserResponseDto.builder()
+                .userCode(user.getUserCode())
+                .userState(user.getUserState())
+                .discussionState(user.getDiscussionState())
+                .kakaoId(user.getKakaoId())
+                .nickname(user.getNickname())
+                .profileImg(user.getProfileImg())
+                .kakaoEmail(user.getKakaoEmail())
+                .userLikes(user.getUserLikes())
+                .socketId(user.getSocketId())
+                .tags(tagList)
+                .build();
+        return dto;
+    }
+
+    public UpdateUserResponseDto updateUserInfo(UpdateUserRequestDto dto) {
         userRepository.updateInfo(dto.getUserCode(), dto.getNickname(), dto.getProfileImg(), dto.getKakaoEmail());
-        User findUser = findVerifiedUser(dto.getUserCode());
+        if(tagsRepository.findByUserCode(dto.getUserCode()) == null){
+            tagsRepository.saveTags(dto.getUserCode(), dto.getTag1(), dto.getTag2(), dto.getTag3());
+        } else {
+            tagsRepository.updateTags(dto.getUserCode(), dto.getTag1(), dto.getTag2(), dto.getTag3());
+        }
 
-        return findUser;
+        UpdateUserResponseDto userInfo = findUserInfo(dto.getUserCode());
+
+        return userInfo;
     }
 
 
@@ -179,11 +229,10 @@ public class UserService {
         User user = findVerifiedUser(userCode);
         int likes = user.getUserLikes();
 
-        if (identifier==1) {
+        if (identifier == 1) {
             likes = likes + 1;
             userRepository.updateUserLikes(userCode, likes);
-        }
-        else if (identifier==0) {
+        } else if (identifier == 0) {
             likes = likes - 1;
             userRepository.updateUserLikes(userCode, likes);
         }
@@ -192,11 +241,21 @@ public class UserService {
     }
 
 
-    public String verifyEmailAndDelete(int userCode, String email) {
+    public String verifyEmailAndDeleteAll(int userCode, String email) {
         User user = findVerifiedUser(userCode);
         String result = "";
 
-        if(user.getKakaoEmail().equals(email)){
+        /**
+         * 이메일 검증 로직
+         */
+
+
+        if (user.getKakaoEmail().equals(email)) {
+            guestbookRepository.deleteAllByUserCode(user.getUserCode());
+            questionsRepository.deleteAllByUserCode(user.getUserCode());
+            declarationRepository.deleteAllByUserCode(user.getUserCode());
+            commentsRepository.deleteAllByUserCode(user.getUserCode());
+            discussionRepository.deleteAllByUserCode(user.getUserCode());
             userRepository.delete(user);
             result = "SUCCESS";
         } else {
@@ -204,6 +263,60 @@ public class UserService {
         }
 
         return result;
+    }
+
+
+    public AllListsResponseDto findAllLists(int userCode) {
+        User user = findVerifiedUser(userCode);
+
+        List<DiscussionsDto> discussionList = userRepository.findAllDiscussions(userCode);
+        List<CommentsDto> commentList = userRepository.findAllComments(userCode);
+        List<QuestionsDto> questionList = userRepository.findAllQuestions(userCode);
+        List<DeclarationsDto> declarationList = userRepository.findAllDeclarations(userCode);
+
+        AllListsResponseDto dto = AllListsResponseDto.builder()
+                .userCode(user.getUserCode())
+                .nickname(user.getNickname())
+                .profileImg(user.getProfileImg())
+                .discussionLists(discussionList)
+                .commentLists(commentList)
+                .questionLists(questionList)
+                .declarationLists(declarationList)
+                .build();
+
+        return dto;
+    }
+
+    public User registerSocketId(int userCode, String socketId) {
+        userRepository.updateSocketId(userCode, socketId);
+        User user = findVerifiedUser(userCode);
+        return user;
+    }
+
+    @Transactional(readOnly = true)
+    public Recommend findVerifiedRecommend(int userCode, int targetCode) {
+        Optional<Recommend> optionalRecommend = recommendRepository.findByUserCodeAndTargetCode(userCode, targetCode);
+        Recommend recommend = optionalRecommend.orElse(null);
+
+        return recommend;
+    }
+
+    public Recommend findLikesHistory(int userCode, int targetCode) {
+        Optional<Recommend> optionalRecommend = recommendRepository.findByUserCodeAndTargetCode(userCode, targetCode);
+        Recommend findRecommend = optionalRecommend.orElseGet(Recommend::new);
+
+        return findRecommend;
+    }
+
+    public void saveUserRecommend(Recommend recommend) {
+        recommendRepository.save(recommend);
+    }
+
+    public void updateUserRecommend(Recommend recommend) {
+        int userCode = recommend.getUserCode();
+        int targetCode = recommend.getTargetCode();
+        String state = recommend.getLikes();
+        recommendRepository.updateLikesState(userCode, targetCode, state);
     }
 
 }
