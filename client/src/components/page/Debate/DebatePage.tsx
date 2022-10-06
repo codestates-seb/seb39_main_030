@@ -12,9 +12,9 @@ import useAddComment from './hooks/useAddComment';
 import useUpdateComment from './hooks/useUpdateComment';
 
 const DebatePage = () => {
-  const user = getStoredUser();
   const [commentIdx, setCommentIdx] = useState<number>(null);
   const param = useParams();
+  const user = getStoredUser();
   const { debate, comment } = useDebate(param.debateCode);
   const addComment = useAddComment();
   const updateComment = useUpdateComment();
