@@ -42,7 +42,6 @@ const UpdateSocket = () => {
 
       default:
         if (user?.socketId) {
-          console.log('ex', user);
           socket.on('me', (id) => {
             dispatch(socketActions.setSocketId(id));
             setStoredUser({
@@ -57,7 +56,6 @@ const UpdateSocket = () => {
             navigate('/');
           });
         } else {
-          console.log('정식', user);
           socket.on('me', (id) => {
             dispatch(socketActions.setSocketId(id));
             socket.emit('setUserCode', {
