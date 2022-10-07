@@ -8,16 +8,9 @@ import { media } from '../../../style/media';
 import Toggle from '../../atom/Toggle';
 import { useDispatch } from 'react-redux';
 import { toggleActions } from '../../../store/debateToggle-slice';
-import { socket } from '../../../auth/SingletonSocket';
 
 const LendingPage = () => {
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    socket.on('me', (id) => {
-      console.log(id);
-    });
-  }, []);
 
   const toggleHandler = (state) => {
     dispatch(toggleActions.setToggle(state));
