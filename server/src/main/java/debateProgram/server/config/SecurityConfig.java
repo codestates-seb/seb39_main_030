@@ -11,10 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.CorsUtils;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 
@@ -27,8 +23,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String FRONT_URL = "http://localhost:3000";
 
-    public static final String S3_URL = "http://pre-project-team30.s3-website.ap-northeast-2.amazonaws.com";
-
     private final CorsFilter corsFilter;
 
     @Bean
@@ -38,8 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .cors().configurationSource(corsConfigurationSource());
+        http.csrf().disable();
 //                .sessionManagement()
 //                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 //
@@ -48,12 +41,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .formLogin().disable()
 //                .addFilter(corsFilter);
 
-
         http.authorizeRequests()
-                .antMatchers(FRONT_URL + "/main/**", S3_URL + "/**").permitAll()
-                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-//                .authenticated()
-//                .anyRequest().permitAll()
+                .antMatchers(FRONT_URL + "/main/**")
+                .authenticated()
+                .anyRequest().permitAll()
 
                 .and()
                 .exceptionHandling()
@@ -62,18 +53,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(new JwtRequestFilter(userRepository), UsernamePasswordAuthenticationFilter.class);
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-
-        configuration.addAllowedOriginPattern("*");
-        configuration.addAllowedMethod("*");
-        configuration.addAllowedHeader("*");
-        configuration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
 
 }

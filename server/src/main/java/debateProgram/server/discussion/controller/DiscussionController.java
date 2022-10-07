@@ -1,14 +1,12 @@
 package debateProgram.server.discussion.controller;
 
-import debateProgram.server.comments.entity.Comments;
-import debateProgram.server.comments.service.CommentsService;
 import debateProgram.server.discussion.entity.Discussion;
 import debateProgram.server.discussion.mapper.DiscussionMapper;
-import debateProgram.server.discussion.model.*;
+import debateProgram.server.discussion.model.PostDiscussionRequestDto;
+import debateProgram.server.discussion.model.UpdateDiscussionRequestDto;
+import debateProgram.server.discussion.model.UpdateDiscussionResponseDto;
 import debateProgram.server.discussion.service.DiscussionService;
 import debateProgram.server.dto.MultiResponseDto;
-import debateProgram.server.user.entity.User;
-import debateProgram.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,15 +33,11 @@ public class DiscussionController {
 
     private final DiscussionMapper discussionMapper;
 
-    private final CommentsService commentsService;
-
-    private final UserService userService;
-
     /**
-     * 토론글 생성 API
+     * 토론 게시글 생성 API
      */
     @PostMapping
-    public ResponseEntity postDiscussion(@Valid @RequestBody PostDiscussionRequestDto postDiscussionRequestDto) {
+    public ResponseEntity postDiscussion(@RequestBody PostDiscussionRequestDto postDiscussionRequestDto) {
         Discussion discussion = discussionMapper.postRequestToDiscussion(postDiscussionRequestDto);
         Discussion response = discussionService.createDiscussion(discussion);
 
@@ -52,82 +45,39 @@ public class DiscussionController {
     }
 
     /**
-     * 토론글 전체 조회 API
+     * 토론 게시글 page, size에 따른 조회 API (무한 스크롤)
+     * DiscussionCode를 기준으로 DESC 정렬
      */
     @GetMapping
     public ResponseEntity getAllDiscussions(@RequestParam int page, @RequestParam int size) {
         Page<Discussion> pageDiscussions = discussionService.findAllDiscussions(page, size);
         List<Discussion> discussions = pageDiscussions.getContent();
 
-        List<AllDiscussionsResponseDto> result = new ArrayList<>();
-
-        for(int i=0; i<discussions.size(); i++){
-            Discussion d = discussions.get(i);
-
-            AllDiscussionsResponseDto responseDto = AllDiscussionsResponseDto.builder()
-                    .discussionCode(d.getDiscussionCode())
-                    .createDate(d.getDiscussionCreateDate())
-                    .discussionTitle(d.getDiscussionTitle())
-                    .discussionContents(d.getDiscussionContents())
-                    .discussionCategory(d.getDiscussionCategory())
-                    .discussionTag(d.getDiscussionTag())
-                    .discussionLikes(d.getDiscussionLikes())
-                    .userCode(d.getUser().getUserCode())
-                    .userState(d.getUser().getUserState())
-                    .nickname(d.getUser().getNickname())
-                    .profileImg(d.getUser().getProfileImg())
-                    .build();
-
-            result.add(responseDto);
-        }
-
-        return new ResponseEntity<>(new MultiResponseDto<>(result, pageDiscussions), HttpStatus.OK);
+        return new ResponseEntity<>(new MultiResponseDto<>(discussions, pageDiscussions), HttpStatus.OK);
     }
 
     /**
-     * 토론글 상세 조회 API
+     * 토론 게시글 상세 조회 API
      */
-    @GetMapping("/detail")
-    public ResponseEntity getDiscussionDetails(@RequestParam("discussionCode") int discussionCode,
-                                               @RequestParam("loginUserCode") int loginUserCode) {
-        DetailDiscussionResponseDto result = discussionService.findDiscussionWithUser(discussionCode, loginUserCode);
-        List<Comments> comments = commentsService.findDiscussionComments(discussionCode);
-
-        List<DetailCommentsResponseDto> commentsDto = new ArrayList<>();
-
-        for (int i=0; i<comments.size(); i++){
-            int userCode = comments.get(i).getUserCode();
-            User userInfo = userService.findVerifiedUser(userCode);
-            Comments commentInfo = comments.get(i);
-
-            DetailCommentsResponseDto dto = DetailCommentsResponseDto.builder()
-                    .userCode(userInfo.getUserCode())
-                    .nickname(userInfo.getNickname())
-                    .profileImg(userInfo.getProfileImg())
-                    .commentCode(commentInfo.getCommentCode())
-                    .commentContents(commentInfo.getCommentContents())
-                    .commentCreateDate(commentInfo.getCommentCreateDate())
-                    .build();
-
-            commentsDto.add(dto);
-        }
+    @GetMapping("/detail/{discussion-code}")
+    public ResponseEntity getDiscussionDetails(@PathVariable("discussion-code") int discussionCode) {
+        Discussion discussion = discussionService.findDiscussionDetails(discussionCode);
 
         List<Object> response = new ArrayList<>();
-        response.add(result);
-        response.add(commentsDto);
+        response.add(discussion);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
-     * 토론글 삭제 API
+     * 토론 게시글 삭제 API
      */
-    @DeleteMapping
-    public ResponseEntity deleteDiscussion(@RequestParam("discussionCode") int discussionCode,
-                                           @RequestParam("userCode") int userCode) {
-        int writerCode = discussionService.findVerifiedDiscussion(discussionCode).getUserCode();
+    @DeleteMapping("/{discussion-code}")
+    public ResponseEntity deleteDiscussion(@PathVariable("discussion-code") int discussionCode,
+                                           @RequestParam("viewerCode") int viewerCode) {
+        int userCode = discussionService.findDiscussionDetails(discussionCode).getUserCode();
 
-        if (writerCode == userCode) {
+        if (userCode == viewerCode) {
             discussionService.deleteDiscussion(discussionCode);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -138,16 +88,18 @@ public class DiscussionController {
     }
 
     /**
-     * 토론글 수정 API
+     * 토론 게시글 수정 API
      */
     @PostMapping("/update")
-    public ResponseEntity updateDiscussion(@Valid @RequestBody UpdateDiscussionRequestDto requestDto) {
-        Discussion details = discussionService.findVerifiedDiscussion(requestDto.getDiscussionCode());
-        int writerCode = details.getUserCode();
+    public ResponseEntity updateDiscussion(@RequestParam("viewerCode") int viewerCode,
+                                           @RequestBody UpdateDiscussionRequestDto updateDiscussionRequestDto) {
+        Discussion details = discussionService.findDiscussionDetails(updateDiscussionRequestDto.getDiscussionCode());
+        int userCode = details.getUserCode();
 
-        if (writerCode == requestDto.getUserCode()) {
-            discussionService.updateDiscussion(requestDto);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+        if (userCode == viewerCode) {
+            Discussion discussion = discussionService.updateDiscussion(details);
+            UpdateDiscussionResponseDto response = discussionMapper.discussionToUpdateResponse(discussion);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         }
         else {
             String result = "수정 불가";
@@ -155,4 +107,22 @@ public class DiscussionController {
         }
     }
 
+    /**
+     * 토론 게시글 좋아요 수 변경 API
+     */
+    @PostMapping("/likes/{discussion-code}")
+    public ResponseEntity updateDiscussionLikes(@PathVariable("discussion-code") int discussionCode,
+                                                @RequestParam("viewerCode") int viewerCode,
+                                                @RequestParam("likes") int likes) {
+        int userCode = discussionService.findDiscussionDetails(discussionCode).getUserCode();
+
+        if (userCode == viewerCode) {
+            String result = "본인의 좋아요는 증감 불가";
+            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+        }
+        else {
+            int response = discussionService.updateDiscussionLikes(discussionCode, likes);
+            return new ResponseEntity(response, HttpStatus.CREATED);
+        }
+    }
 }

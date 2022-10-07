@@ -37,9 +37,6 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 
-	testCompileOnly 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
-
 	implementation group: 'com.auth0', name: 'java-jwt', version: '3.10.2'
 
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.1'

@@ -2,25 +2,37 @@ const express = require("express");
 const http = require("http");
 const cli = require("nodemon/lib/cli");
 const app = express();
-const server = http.createServer(app);
+const fs = require('fs');
 
+const KEY_URL="etc/letsencrypt/live/team30/kro.kr";
+const options = {
+  key: fs.readFileSync(`${KEY_URL}/privkey.pem`),
+  cert: fs.readFileSync(`${KEY_URL}/cert.pem`),
+  ca: fs.readFileSync(`${KEY_URL}/chain.pem`),
+};
+
+const server = http.createServer(options, app);
 const io = require("socket.io")(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
   },
 });
-// const user = {
-//   chatId: "",
-//   videoId: "",
-// };
 
-const PORT = process.env.PORT || 5002;
+
+const HTTPS_PORT = process.env.PORT || 8080;
 
 const client = [];
 const VideoID = [];
 
 const allSocket = {};
+app.get("/test", function (req, res) {
+  res.send("test");
+})
+
+app.get("/", function (req,res) {
+  res.status(201).send("root");
+})
 
 io.on("connection", (socket) => {
   //화상채팅
@@ -63,38 +75,6 @@ io.on("connection", (socket) => {
   socket.on("answerCall", (data) => {
     io.to(data.to).emit("callAccepted", data.signal);
   });
-
-  //채팅
-  // socket.on("start", () => {
-    // user.chatId = socket.id;
-    // console.log("Chatuser:", user);
-    // if (user.videoId !== "" && user.chatId !== "") {
-    //   client.push(user);
-    // }
-  // });
-
-  // socket.on("videoChatId", (data) => {
-  //   VideoID.push(data);
-  //   socket.emit("videoID", VideoID[2]);
-  // });
-
-  // socket.on("msg", (data) => {
-  //   console.log("메세지", data);
-  // });
-
-  // socket.on("join_room", (data) => {
-  //   socket.join(data);
-  //   console.log(`User with ID: ${socket.id} joined room: ${data}`);
-  // });
-  //
-  // socket.on("send_message", (data) => {
-  //   socket.to(data.room).emit("receive_message", data);
-  //   console.log("msg", data);
-  // });
-  //
-  // socket.on("disconnect", () => {
-  //   console.log("User Disconnected", socket.id);
-  // });
 });
 
-server.listen(PORT, () => console.log(`server has started on port ${PORT}`));
+server.listen(HTTPS_PORT, () => console.log(`🚀 HTTPS Server is starting on ${HTTPS_PORT}`));

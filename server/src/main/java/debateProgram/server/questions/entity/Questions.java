@@ -1,8 +1,6 @@
 package debateProgram.server.questions.entity;
 
-import debateProgram.server.user.entity.User;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -11,9 +9,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "questions")
+@Table(name="questions")
 @NoArgsConstructor
-@DynamicInsert
 public class Questions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,9 +33,4 @@ public class Questions {
 
     @Column
     private String questionClear;
-
-    @ManyToOne
-    @JoinColumn(name="userCode", insertable = false, updatable = false)
-    private User user;
-
 }

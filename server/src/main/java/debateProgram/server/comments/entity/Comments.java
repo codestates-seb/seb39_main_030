@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @Table(name="comments")
 @NoArgsConstructor
 public class Comments {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int commentCode;
@@ -30,6 +29,9 @@ public class Comments {
     private String commentContents;
 
     @Column
-    private LocalDateTime commentCreateDate = LocalDateTime.now();
+    private LocalDateTime comment_create_date = LocalDateTime.now();
+
+
+
 
 }

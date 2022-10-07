@@ -1,18 +1,17 @@
 package debateProgram.server.user.controller;
 
-import debateProgram.server.discussion.service.DiscussionService;
-import debateProgram.server.user.recommend.Recommend;
 import debateProgram.server.user.entity.User;
 import debateProgram.server.user.mapper.UserMapper;
-import debateProgram.server.user.model.*;
-import debateProgram.server.user.recommend.RecommendRequestDto;
+import debateProgram.server.user.model.OauthToken;
+import debateProgram.server.user.model.OtherUserResponseDto;
+import debateProgram.server.user.model.UpdateUserRequestDto;
+import debateProgram.server.user.model.UpdateUserResponseDto;
 import debateProgram.server.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 
 @Slf4j
 @RestController
@@ -23,8 +22,6 @@ public class UserController {
     private final UserService userService;
 
     private final UserMapper userMapper;
-
-    private final DiscussionService discussionService;
 
     /**
      * 카카오 oauth 로그인 API
@@ -52,26 +49,12 @@ public class UserController {
     }
 
     /**
-     * 사용자 삭제 API
-     */
-    @DeleteMapping
-    public ResponseEntity deleteUser(@RequestParam("userCode") int userCode,
-                                     @RequestParam("kakaoEmail") String email){
-        String result = userService.verifyEmailAndDeleteAll(userCode, email);
-
-        if(result.equals("FAIL")){
-            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
-        }
-
-        return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
-    }
-
-    /**
      * 마이페이지 조회 API
      */
     @GetMapping("/myInfo")
     public ResponseEntity userInfo(@RequestParam("userCode") int userCode){
-        UpdateUserResponseDto result = userService.findUserInfo(userCode);
+        User user = userService.findVerifiedUser(userCode);
+        UpdateUserResponseDto result = userMapper.userToUserResponse(user);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -81,9 +64,10 @@ public class UserController {
      */
     @PostMapping("/myInfo")
     public ResponseEntity updateUserInfo(@RequestBody UpdateUserRequestDto updateUserRequestDto){
-        UpdateUserResponseDto updateResult = userService.updateUserInfo(updateUserRequestDto);
+        User updateUser = userService.updateUserInfo(updateUserRequestDto);
+        UpdateUserResponseDto result = userMapper.userToUserResponse(updateUser);
 
-        return new ResponseEntity<>(updateResult, HttpStatus.CREATED);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     /**
@@ -98,13 +82,18 @@ public class UserController {
     }
 
     /**
-     * 사용자가 작성한 전체 글 조회 API
+     * 사용자 삭제 API
      */
-    @GetMapping("/lists")
-    public ResponseEntity getAllList(@RequestParam("userCode") int userCode){
-        AllListsResponseDto result = userService.findAllLists(userCode);
+    @DeleteMapping
+    public ResponseEntity deleteUser(@RequestParam("userCode") int userCode,
+                                     @RequestParam("kakaoEmail") String email){
+        String result = userService.verifyEmailAndDelete(userCode, email);
 
-        return new ResponseEntity(result, HttpStatus.OK);
+        if(result.equals("FAIL")){
+            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -119,66 +108,35 @@ public class UserController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-
     /**
-     * 사용자 socketId 변경 API
-     */
-    @PostMapping("/socket")
-    public ResponseEntity updateSocketId(@RequestParam("userCode") int userCode,
-                                         @RequestParam("socketId") String socketId){
-        User updatedUser = userService.registerSocketId(userCode, socketId);
-        SocketIdResponseDto result = userMapper.userToSocketResponse(updatedUser);
-
-        return new ResponseEntity(result, HttpStatus.CREATED);
-    }
-
-    /**
-     * 사용자의 토론글 좋아요 수 변경 API
+     * 사용자 좋아요 수 변경 API
      */
     @PostMapping("/likes")
-    public ResponseEntity updateUserLikesV2(@RequestBody RecommendRequestDto requestDto){
-        Recommend recommend = userMapper.recommendRequestToRecommend(requestDto);
-        int userCode = recommend.getUserCode();
-        int targetCode = recommend.getTargetCode();
-
-        if(userCode == targetCode){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    public ResponseEntity updateUserLikes(@RequestParam("userCode") int userCode,
+                                          @RequestParam("viewerCode") int viewerCode,
+                                          @RequestParam("likes") int likes){
+        if(userCode == viewerCode) {
+            String result = "본인의 좋아요는 증감 불가";
+            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
         }
-
-        Recommend history = userService.findVerifiedRecommend(userCode, targetCode);
-
-        // 좋아요 수 증가를 원하는 경우
-        if(recommend.getLikes().equals("Y")){
-            if(history==null || history.getLikes().equals("N")){
-                if(history==null){
-                    userService.saveUserRecommend(recommend);
-                    discussionService.updateDiscussionLikes(targetCode, 1);
-                }
-                else if(history.getLikes().equals("N")){
-                    userService.updateUserRecommend(recommend);
-                    discussionService.updateDiscussionLikes(targetCode, 1);
-                }
-                return new ResponseEntity<>(HttpStatus.CREATED);
-            }
-            else {
-                String result = "이미 좋아요를 눌렀음";
-                return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
-            }
+        else {
+            int result = userService.updateUserLikes(viewerCode, likes);
+            return new ResponseEntity(result, HttpStatus.CREATED);
         }
-        // 좋아요 수 취소를 원하는 경우
-        else if(recommend.getLikes().equals("N")) {
-            if(history!=null && history.getLikes().equals("Y")){
-                userService.updateUserRecommend(recommend);
-                discussionService.updateDiscussionLikes(targetCode, 0);
-                return new ResponseEntity<>(HttpStatus.CREATED);
-            }
-            else {
-                String result = "좋아요 기록이 없으므로 취소 불가";
-                return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
-            }
-        }
-        String result = "요청값을 다시 확인바람";
-        return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+    }
+
+
+    /**
+     * 사용자가 작성한 전체 글 조회 API
+     */
+    @GetMapping("/lists")
+    public ResponseEntity getAllList(@RequestParam("userCode") int userCode){
+        User user = userService.findVerifiedUser(userCode);
+
+    // 결과 dto 생성, Json 관련 어노테이션 삭제
+    // 문의글, 신고글, 댓글까지 나오게 연관관계 매핑
+
+        return new ResponseEntity(user, HttpStatus.OK);
     }
 
 }

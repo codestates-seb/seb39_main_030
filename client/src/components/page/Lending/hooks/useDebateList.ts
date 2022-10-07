@@ -27,12 +27,14 @@ interface UseDebateList {
   currentTag: string;
   setCurrentTag: Dispatch<SetStateAction<string>>;
   setOnline: Dispatch<SetStateAction<boolean>>;
+  serverError: boolean;
 }
 
 const useDebateList = (): UseDebateList => {
   const [searchWord, setSearchWord] = useState('all#@!');
   const [currentTag, setCurrentTag] = useState('all#@!');
   const [online, setOnline] = useState(false);
+  const [serverError, setServerError] = useState(false);
 
   const selectFn = useCallback(
     (debateList: Debate[]) => {
@@ -62,6 +64,12 @@ const useDebateList = (): UseDebateList => {
     getDebateList,
     {
       select: selectFn,
+      onError: () => {
+        setServerError(true);
+      },
+      onSuccess: () => {
+        setServerError(false);
+      },
     }
   );
 
@@ -72,6 +80,7 @@ const useDebateList = (): UseDebateList => {
     currentTag,
     setCurrentTag,
     setOnline,
+    serverError,
   };
 };
 
