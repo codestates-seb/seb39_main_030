@@ -62,7 +62,7 @@ const DebateCommentInput = ({
         <div className="tempLine" />
       </div>
       <AiOutlineSend
-        onClick={() => handler(areaRef.current.value, areaRef.current)}
+        onMouseDown={() => handler(areaRef.current.value, areaRef.current)}
         className="btn-comment"
       />
     </StyledCommentInput>

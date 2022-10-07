@@ -10,14 +10,11 @@ import Layout, { basicToastOption } from './Layout';
 import RouteList from './RouteList';
 import { ThemeProvider } from 'styled-components';
 import ModalPortal from '../block/Modal/ModalPortal';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import useModal from './hooks/useModal';
-import { getStoredUser } from '../../auth/user-storage';
 
 const App = () => {
-  const { openModal } = useModal();
   const theme = useCustomTheme();
   const mode = useSelector((state: RootState) => state.darkMode.mode) as string;
   // useEffect(() => {

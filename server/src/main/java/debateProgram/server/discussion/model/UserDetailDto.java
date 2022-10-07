@@ -5,5 +5,5 @@ public interface UserDetailDto {
     String getNickname();
     String getProfileImg();
     String getUserState();
-
+    
 }
