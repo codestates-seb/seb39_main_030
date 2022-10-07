@@ -64,6 +64,13 @@ const VideoPage = () => {
       setCallEnded(true);
       connectionRef.current.destroy();
       navigate('/');
+      openModal({
+        type: 'guestbook',
+        props: {
+          userCode: masterUserCode || 도전자.SlaveSocketId,
+          nickname: '방금 토론한 상대',
+        },
+      });
       toast.info(
         '상대방이 토론을 끝냈습니다. 상대의 방명록에 글을 남겨보세요.',
         {
@@ -128,7 +135,7 @@ const VideoPage = () => {
     openModal({
       type: 'guestbook',
       props: {
-        userCode: masterUserCode || user.userCode,
+        userCode: caller || 도전자.SlaveSocketId,
         nickname: '방금 토론한 상대',
       },
     });

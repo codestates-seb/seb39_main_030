@@ -61,7 +61,12 @@ export function useAuth(): UseAuth {
   }
 
   async function signIn(code: string): Promise<void> {
-    authServerCall(`/user/oauth/token?code=${code}`); // 실데이터
+    if (process.env.NODE_ENV === 'development') {
+      authServerCall(`/user/oauth/token/test?code=${code}`); // 실데이터
+    } else {
+      authServerCall(`/user/oauth/token?code=${code}`); // 실데이터
+    }
+
     // authServerCall(`/user/oauth/token`);
   }
   async function signUp(): Promise<void> {

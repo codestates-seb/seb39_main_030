@@ -84,7 +84,12 @@ const DebateMain = ({ debate, getKST }) => {
       //userCode: user.temp.toString(),
     });
 
-    navigate('/video');
+    navigate('/video', {
+      state: {
+        SlaveUserCode: user.userCode.toString(),
+        SlaveSocketId: user.socketId.toString(),
+      },
+    });
   };
 
   return (
@@ -157,7 +162,9 @@ const DebateMain = ({ debate, getKST }) => {
         </Text>
         <Button
           onClick={moveVideoPage}
-          disabled={debate?.userInfo.userState === 'Y' ? false : true}
+          disabled={
+            debate?.userInfo.userState === 'Y' && user.userCode ? false : true
+          }
         >
           토론 신청
         </Button>
