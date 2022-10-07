@@ -18,6 +18,7 @@ const DebateList = () => {
     setSearchWord,
     setCurrentTag,
     setOnline,
+    serverError,
   } = useDebateList();
 
   const searchSignal = useSelector(
@@ -41,6 +42,21 @@ const DebateList = () => {
       setCurrentTag('all#@!');
     };
   }, [searchSignal, params.searchWord, curTag, toggleState]);
+
+  if (serverError) {
+    return (
+      <StyledDebateList>
+        <div>
+          <br />
+          <br />
+          <br />
+          <Text fontSize="xxl" fontWeight="bold">
+            서버 점검 중입니다 🔧
+          </Text>
+        </div>
+      </StyledDebateList>
+    );
+  }
 
   if (
     searchWord === 'all#@!' &&
