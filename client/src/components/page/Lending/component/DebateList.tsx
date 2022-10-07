@@ -51,7 +51,7 @@ const DebateList = () => {
           <br />
           <br />
           <Text fontSize="xxl" fontWeight="bold">
-            서버 점검 중입니다 🔧
+            🔧 서버 점검 중입니다 🔧
           </Text>
         </div>
       </StyledDebateList>
