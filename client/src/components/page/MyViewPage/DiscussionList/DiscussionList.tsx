@@ -3,12 +3,13 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Discussion from './Discussion';
 import { getKST } from '../../../app/util';
+import { getStoredUser } from '../../../../auth/user-storage';
 
 export default function DiscussionList() {
   const [discussionList, setDiscussionList] = useState<any>([]);
   const [userImg, setUserImg] = useState<string>();
-
-  const userCode = 1001;
+  const user = getStoredUser();
+  const userCode = user.userCode;
   const params = { userCode };
   useEffect(() => {
     axiosInstance.get('/user/lists', { params }).then(function (response) {
