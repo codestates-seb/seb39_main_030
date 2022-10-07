@@ -162,9 +162,7 @@ const DebateMain = ({ debate, getKST }) => {
         </Text>
         <Button
           onClick={moveVideoPage}
-          disabled={
-            debate?.userInfo.userState === 'Y' && user.userCode ? false : true
-          }
+          disabled={debate?.userInfo.userState === 'Y' && user ? false : true}
         >
           토론 신청
         </Button>

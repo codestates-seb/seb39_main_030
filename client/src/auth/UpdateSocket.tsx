@@ -76,7 +76,6 @@ const UpdateSocket = () => {
   useEffect(() => {
     socket.on('receiveFight', (data) => {
       dispatch(signal(true));
-      // dispatch(socketActions.signal(true));
       toast.info('토론 신청이 왔습니다!.', {
         position: 'top-center',
         ...basicToastOption,
@@ -87,13 +86,6 @@ const UpdateSocket = () => {
       });
     });
   }, []);
-
-  // useEffect(() => {
-  //   const user = getStoredUser();
-  //   console.log(user && user.socketId);
-  //   if (socketSignal) {
-  //   }
-  // }, [socketSignal]);
 
   return (
     <div>
