@@ -84,12 +84,7 @@ const DebateMain = ({ debate, getKST }) => {
       //userCode: user.temp.toString(),
     });
 
-    navigate('/video', {
-      state: {
-        SlaveUserCode: user.userCode.toString(),
-        SlaveSocketId: user.socketId.toString(),
-      },
-    });
+    navigate('/video');
   };
 
   return (

@@ -27,7 +27,7 @@ export default function ReportDetail() {
     });
   }, []);
   const discussionCodeHandler = () => {
-    navigate(`/`);
+    navigate(`/debate/${reportData.discussionCode}`);
   };
 
   const onClickAnswer = () => {

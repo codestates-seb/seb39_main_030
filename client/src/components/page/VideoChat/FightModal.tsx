@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 const FightModal = ({ onClose, fightUser }) => {
   const navigate = useNavigate();
   const moveToVideo = () => {
-    // 두번재 인자의 state 속성에 원하는 파라미터를 넣어준다. (id, job을 넣어봤다)
     navigate('/video', {
       state: fightUser,
     });

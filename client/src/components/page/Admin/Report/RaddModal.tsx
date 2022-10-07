@@ -7,10 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { basicToastOption } from '../../../app/Layout';
 
-// questionCode: state.questionCode,
-// answer: answerContent,
-// userCode: state.userCode,
-
 const RaddModal = ({
   onClose,
   userCode,
@@ -19,7 +15,6 @@ const RaddModal = ({
 }) => {
   const navigate = useNavigate();
   const addModalHandler = async () => {
-    console.log(userCode, declarationCode, declarationAnswer);
     await axiosInstance
       .post('/declaration/feedback', {
         declarationCode: declarationCode,
