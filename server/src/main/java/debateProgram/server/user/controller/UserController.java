@@ -45,6 +45,21 @@ public class UserController {
     }
 
     /**
+     * [TEST]
+     * 카카오 oauth 로그인 API
+     */
+    @GetMapping("/oauth/token/test")
+    public ResponseEntity userLoginTest(@RequestParam("code") String code) {
+        OauthToken oauthToken = userService.getAccessTokenTest(code);
+        log.info("code = {}", oauthToken);
+
+        User user = userService.saveUserAndGetUser(oauthToken.getAccess_token());
+        log.info("user = {}", user);
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    /**
      * 사용자 로그아웃 API
      */
     @PostMapping("/logout")

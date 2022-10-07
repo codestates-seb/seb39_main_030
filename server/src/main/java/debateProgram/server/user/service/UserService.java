@@ -66,22 +66,18 @@ public class UserService {
 
         RestTemplate restTemplate = new RestTemplate();
 
-        //HttpHeader
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
-        //HttpBody
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", client_id);
-        params.add("redirect_uri", "http://pre-project-team30.s3-website.ap-northeast-2.amazonaws.com/auth");
+        params.add("redirect_uri", "https://team30.vercel.app/auth");
         params.add("code", code);
         params.add("client_secret", client_secret);
 
-        //HttpEntity (헤더와 바디를 담을 객체)
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
 
-        //응답 형식인 json에 맞추어 객체 생성
         ResponseEntity<String> accessTokenResponse = restTemplate.exchange(
                 "https://kauth.kakao.com/oauth/token",
                 HttpMethod.POST,
@@ -89,11 +85,42 @@ public class UserService {
                 String.class
         );
 
-        /**
-         * ObjectMapper
-         * String으로 받은 Json 형식의 데이터를 객체로 변환 함.
-         * readValue(Json 데이터, 변환할 클래스)
-         */
+        ObjectMapper objectMapper = new ObjectMapper();
+        OauthToken oauthToken = null;
+
+        try {
+            oauthToken = objectMapper.readValue(accessTokenResponse.getBody(), OauthToken.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return oauthToken;
+    }
+
+
+    public OauthToken getAccessTokenTest(String testCode) {
+
+        RestTemplate restTemplateTest = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", client_id);
+        params.add("redirect_uri", "https://localhost:3000/auth");
+        params.add("code", testCode);
+        params.add("client_secret", client_secret);
+
+        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
+
+        ResponseEntity<String> accessTokenResponse = restTemplateTest.exchange(
+                "https://kauth.kakao.com/oauth/token",
+                HttpMethod.POST,
+                kakaoTokenRequest,
+                String.class
+        );
+
         ObjectMapper objectMapper = new ObjectMapper();
         OauthToken oauthToken = null;
 
