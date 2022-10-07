@@ -19,10 +19,12 @@ const LeaveModal = ({ onClose, userCode, kakaoEmail }) => {
     <Modal onClose={onClose}>
       <StyledLogout>
         <Text className="title" fontSize="md" fontWeight="semiBold">
-          정말 탈퇴하실건가요? 🥲
+          {/*정말 탈퇴하실건가요? 🥲*/} 한번 회원은 영원한 회원이다 ^^
         </Text>
         <div className="button">
-          <Button onClick={LeveModalHandler}>예</Button>
+          <Button onClick={LeveModalHandler} disabled={true}>
+            예
+          </Button>
           <Button onClick={onClose}>아니오</Button>
         </div>
       </StyledLogout>
