@@ -1,17 +1,22 @@
 package debateProgram.server.user.controller;
 
+import debateProgram.server.discussion.service.DiscussionService;
+import debateProgram.server.user.recommend.Recommend;
 import debateProgram.server.user.entity.User;
 import debateProgram.server.user.mapper.UserMapper;
-import debateProgram.server.user.model.OauthToken;
-import debateProgram.server.user.model.OtherUserResponseDto;
-import debateProgram.server.user.model.UpdateUserRequestDto;
-import debateProgram.server.user.model.UpdateUserResponseDto;
+import debateProgram.server.user.model.*;
+import debateProgram.server.user.recommend.RecommendRequestDto;
 import debateProgram.server.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.regex.Pattern;
+
 
 @Slf4j
 @RestController
@@ -23,12 +28,29 @@ public class UserController {
 
     private final UserMapper userMapper;
 
+    private final DiscussionService discussionService;
+
     /**
      * 카카오 oauth 로그인 API
      */
     @GetMapping("/oauth/token")
     public ResponseEntity userLogin(@RequestParam("code") String code) {
         OauthToken oauthToken = userService.getAccessToken(code);
+        log.info("code = {}", oauthToken);
+
+        User user = userService.saveUserAndGetUser(oauthToken.getAccess_token());
+        log.info("user = {}", user);
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    /**
+     * [TEST]
+     * 카카오 oauth 로그인 API
+     */
+    @GetMapping("/oauth/token/test")
+    public ResponseEntity userLoginTest(@RequestParam("code") String code) {
+        OauthToken oauthToken = userService.getAccessTokenTest(code);
         log.info("code = {}", oauthToken);
 
         User user = userService.saveUserAndGetUser(oauthToken.getAccess_token());
@@ -49,12 +71,31 @@ public class UserController {
     }
 
     /**
+     * 사용자 삭제 API
+     */
+    @DeleteMapping
+    public ResponseEntity deleteUser(@RequestParam("userCode") int userCode,
+                                     @RequestParam("kakaoEmail") String email){
+        String regexp = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+        if (!Pattern.matches(regexp, email)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        String result = userService.verifyEmailAndDeleteAll(userCode, email);
+
+        if(result.equals("FAIL")){
+            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
+    }
+
+    /**
      * 마이페이지 조회 API
      */
     @GetMapping("/myInfo")
     public ResponseEntity userInfo(@RequestParam("userCode") int userCode){
-        User user = userService.findVerifiedUser(userCode);
-        UpdateUserResponseDto result = userMapper.userToUserResponse(user);
+        UpdateUserResponseDto result = userService.findUserInfo(userCode);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -63,11 +104,13 @@ public class UserController {
      * 마이페이지 수정 API
      */
     @PostMapping("/myInfo")
-    public ResponseEntity updateUserInfo(@RequestBody UpdateUserRequestDto updateUserRequestDto){
-        User updateUser = userService.updateUserInfo(updateUserRequestDto);
-        UpdateUserResponseDto result = userMapper.userToUserResponse(updateUser);
+    public ResponseEntity updateUserInfo(@Valid @RequestBody UpdateUserRequestDto updateUserRequestDto, Errors errors){
+        if (errors.hasErrors()) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        UpdateUserResponseDto updateResult = userService.updateUserInfo(updateUserRequestDto);
 
-        return new ResponseEntity<>(result, HttpStatus.CREATED);
+        return new ResponseEntity<>(updateResult, HttpStatus.CREATED);
     }
 
     /**
@@ -82,18 +125,13 @@ public class UserController {
     }
 
     /**
-     * 사용자 삭제 API
+     * 사용자가 작성한 전체 글 조회 API
      */
-    @DeleteMapping
-    public ResponseEntity deleteUser(@RequestParam("userCode") int userCode,
-                                     @RequestParam("kakaoEmail") String email){
-        String result = userService.verifyEmailAndDelete(userCode, email);
+    @GetMapping("/lists")
+    public ResponseEntity getAllList(@RequestParam("userCode") int userCode){
+        AllListsResponseDto result = userService.findAllLists(userCode);
 
-        if(result.equals("FAIL")){
-            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
-        }
-
-        return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
+        return new ResponseEntity(result, HttpStatus.OK);
     }
 
     /**
@@ -108,35 +146,66 @@ public class UserController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+
     /**
-     * 사용자 좋아요 수 변경 API
+     * 사용자 socketId 변경 API
      */
-    @PostMapping("/likes")
-    public ResponseEntity updateUserLikes(@RequestParam("userCode") int userCode,
-                                          @RequestParam("viewerCode") int viewerCode,
-                                          @RequestParam("likes") int likes){
-        if(userCode == viewerCode) {
-            String result = "본인의 좋아요는 증감 불가";
-            return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
-        }
-        else {
-            int result = userService.updateUserLikes(viewerCode, likes);
-            return new ResponseEntity(result, HttpStatus.CREATED);
-        }
+    @PostMapping("/socket")
+    public ResponseEntity updateSocketId(@RequestParam("userCode") int userCode,
+                                         @RequestParam("socketId") String socketId){
+        User updatedUser = userService.registerSocketId(userCode, socketId);
+        SocketIdResponseDto result = userMapper.userToSocketResponse(updatedUser);
+
+        return new ResponseEntity(result, HttpStatus.CREATED);
     }
 
-
     /**
-     * 사용자가 작성한 전체 글 조회 API
+     * 사용자의 토론글 좋아요 수 변경 API
      */
-    @GetMapping("/lists")
-    public ResponseEntity getAllList(@RequestParam("userCode") int userCode){
-        User user = userService.findVerifiedUser(userCode);
+    @PostMapping("/likes")
+    public ResponseEntity updateUserLikesV2(@RequestBody RecommendRequestDto requestDto){
+        Recommend recommend = userMapper.recommendRequestToRecommend(requestDto);
+        int userCode = recommend.getUserCode();
+        int targetCode = recommend.getTargetCode();
 
-    // 결과 dto 생성, Json 관련 어노테이션 삭제
-    // 문의글, 신고글, 댓글까지 나오게 연관관계 매핑
+        if(userCode == targetCode){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
 
-        return new ResponseEntity(user, HttpStatus.OK);
+        Recommend history = userService.findVerifiedRecommend(userCode, targetCode);
+
+        // 좋아요 수 증가를 원하는 경우
+        if(recommend.getLikes().equals("Y")){
+            if(history==null || history.getLikes().equals("N")){
+                if(history==null){
+                    userService.saveUserRecommend(recommend);
+                    discussionService.updateDiscussionLikes(targetCode, 1);
+                }
+                else if(history.getLikes().equals("N")){
+                    userService.updateUserRecommend(recommend);
+                    discussionService.updateDiscussionLikes(targetCode, 1);
+                }
+                return new ResponseEntity<>(HttpStatus.CREATED);
+            }
+            else {
+                String result = "이미 좋아요를 눌렀음";
+                return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+            }
+        }
+        // 좋아요 수 취소를 원하는 경우
+        else if(recommend.getLikes().equals("N")) {
+            if(history!=null && history.getLikes().equals("Y")){
+                userService.updateUserRecommend(recommend);
+                discussionService.updateDiscussionLikes(targetCode, 0);
+                return new ResponseEntity<>(HttpStatus.CREATED);
+            }
+            else {
+                String result = "좋아요 기록이 없으므로 취소 불가";
+                return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+            }
+        }
+        String result = "요청값을 다시 확인바람";
+        return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
     }
 
 }
