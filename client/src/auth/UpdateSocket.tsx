@@ -12,30 +12,24 @@ import { socketActions } from '../store/socket-slice';
 import { RootState } from '../store';
 import useModal from '../components/app/hooks/useModal';
 import { signal } from '../store/uiSlice/modal-slice';
-import { stopBothVideoAndAudio } from '../components/page/VideoChat/util';
 
-interface IState {
-  msg: string;
-  other: any;
-}
 const UpdateSocket = () => {
   const dispatch = useDispatch();
   const user = getStoredUser();
   const updateSocketId = useSocket();
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as IState;
+  const state = location.state;
+  const { openModal } = useModal();
   const masterUserCode = useSelector(
     (state: RootState) => state.socket.masterUserCode
   );
   const slaveUserCode = useSelector(
     (state: RootState) => state.socket.slaveUserCode
   );
-  const { openModal } = useModal();
 
   useEffect(() => {
-    console.log(state?.msg);
-    switch (state?.msg) {
+    switch (state) {
       case 'logout':
         socket.emit('forceDisconnect', { userCode: user?.userCode });
         updateSocketId({
@@ -66,38 +60,38 @@ const UpdateSocket = () => {
             nickname: '방금 토론한 상대',
           },
         });
-        dispatch(socketActions.setSlave(''));
-        dispatch(socketActions.setSocketId(''));
-        socket.on('me', (id) => {
-          console.log('소켓 갱신!', id);
-          dispatch(socketActions.setSocketId(id));
-          socket.emit('setUserCode', {
-            userCode: user.userCode,
-            socketId: id,
-          });
-          setStoredUser({ ...user, socketId: id });
-          updateSocketId({
-            userCode: Number(user.userCode),
-            socketId: id,
-          });
-        });
-        navigate('/');
         break;
 
       default:
-        socket.on('me', (id) => {
-          console.log('소켓 갱신!', id);
-          dispatch(socketActions.setSocketId(id));
-          socket.emit('setUserCode', {
-            userCode: user.userCode,
-            socketId: id,
+        if (user?.socketId) {
+          socket.on('me', (id) => {
+            dispatch(socketActions.setSocketId(id));
+            setStoredUser({
+              ...user,
+              socketId: id,
+              temp: Number(user?.userCode) + 1,
+            });
+            socket.emit('setUserCode', {
+              userCode: Number(user?.userCode) + 1,
+              socketId: id,
+            });
+            navigate('/');
+            console.log('현재 나의 아이디는?', id);
           });
-          setStoredUser({ ...user, socketId: id });
-          updateSocketId({
-            userCode: Number(user.userCode),
-            socketId: id,
+        } else {
+          socket.on('me', (id) => {
+            dispatch(socketActions.setSocketId(id));
+            socket.emit('setUserCode', {
+              userCode: user.userCode,
+              socketId: id,
+            });
+            setStoredUser({ ...user, socketId: id });
+            updateSocketId({
+              userCode: Number(user.userCode),
+              socketId: id,
+            });
           });
-        });
+        }
         break;
     }
   }, []);
