@@ -46,6 +46,7 @@ const VideoPage = () => {
   const 도전자 = location.state as 도전자;
 
   const endChat = () => {
+    stopBothVideoAndAudio(stream);
     setCallEnded(true);
     connectionRef.current.destroy();
   };
@@ -90,9 +91,10 @@ const VideoPage = () => {
     });
     socket.on('callEnded', () => {
       console.log('calluser 속');
-      endChat();
-      peer.close();
+      //endChat();
+      connectionRef.current.destroy();
       navigate('/socket', { state: 'end' });
+      peer.close();
     });
     connectionRef.current = peer;
   };
@@ -113,10 +115,12 @@ const VideoPage = () => {
     });
 
     socket.on('callEnded', () => {
-      console.log('calluser 속');
+      console.log('callanswer 속');
       //endChat();
+      connectionRef.current.destroy();
       navigate('/socket', { state: 'end' });
       peer.close();
+      endChat();
     });
 
     peer.signal(callerSignal);
@@ -128,21 +132,24 @@ const VideoPage = () => {
     socket.emit('end', {
       targetUserId: caller || 도전자.SlaveSocketId,
     });
+    socket.emit('end', {
+      targetUserId: mySocketId,
+    });
     setCallEnded(true);
     stopBothVideoAndAudio(stream);
     connectionRef.current.destroy();
-    navigate('/');
-    toast.info('토론을 끝냈습니다. 상대방의 방명록에 글을 남겨보세요.', {
-      position: 'top-center',
-      ...basicToastOption,
-    });
-    openModal({
-      type: 'guestbook',
-      props: {
-        userCode: masterUserCode || 도전자.SlaveUserCode,
-        nickname: '방금 토론한 상대',
-      },
-    });
+    //navigate('/');
+    // toast.info('토론을 끝냈습니다. 상대방의 방명록에 글을 남겨보세요.', {
+    //   position: 'top-center',
+    //   ...basicToastOption,
+    // });
+    // openModal({
+    //   type: 'guestbook',
+    //   props: {
+    //     userCode: masterUserCode || 도전자.SlaveUserCode,
+    //     nickname: '방금 토론한 상대',
+    //   },
+    // });
   };
 
   return (
