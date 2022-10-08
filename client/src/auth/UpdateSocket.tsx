@@ -12,14 +12,19 @@ import { socketActions } from '../store/socket-slice';
 import { RootState } from '../store';
 import useModal from '../components/app/hooks/useModal';
 import { signal } from '../store/uiSlice/modal-slice';
+import { stopBothVideoAndAudio } from '../components/page/VideoChat/util';
 
+interface IState {
+  msg: string;
+  other: any;
+}
 const UpdateSocket = () => {
   const dispatch = useDispatch();
   const user = getStoredUser();
   const updateSocketId = useSocket();
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state;
+  const state = location.state as IState;
   const masterUserCode = useSelector(
     (state: RootState) => state.socket.masterUserCode
   );
@@ -29,8 +34,8 @@ const UpdateSocket = () => {
   const { openModal } = useModal();
 
   useEffect(() => {
-    console.log(state);
-    switch (state) {
+    console.log(state?.msg);
+    switch (state?.msg) {
       case 'logout':
         socket.emit('forceDisconnect', { userCode: user?.userCode });
         updateSocketId({
@@ -47,7 +52,6 @@ const UpdateSocket = () => {
         break;
 
       case 'end':
-        console.log('상대가 끝냈습니다.', slaveUserCode, masterUserCode);
         toast.info(
           '상대방이 토론을 끝냈습니다. 상대의 방명록에 글을 남겨보세요.',
           {
