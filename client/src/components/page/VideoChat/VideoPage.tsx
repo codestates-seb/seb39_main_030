@@ -70,7 +70,7 @@ const VideoPage = () => {
       openModal({
         type: 'guestbook',
         props: {
-          userCode: 도전자.SlaveUserCode || masterUserCode,
+          userCode: masterUserCode || 도전자.SlaveUserCode,
           nickname: '방금 토론한 상대',
         },
       });
@@ -137,7 +137,7 @@ const VideoPage = () => {
     openModal({
       type: 'guestbook',
       props: {
-        userCode: 도전자.SlaveUserCode || masterUserCode,
+        userCode: masterUserCode || 도전자.SlaveUserCode,
         nickname: '방금 토론한 상대',
       },
     });
