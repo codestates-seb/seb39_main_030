@@ -8,12 +8,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Button from '../../atom/Button';
 import Loading from '../../app/Loading';
 import { socket } from '../../../auth/SingletonSocket';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { toast } from 'react-toastify';
 import { basicToastOption } from '../../app/Layout';
 import { getStoredUser } from '../../../auth/user-storage';
 import useModal from '../../app/hooks/useModal';
+import { socketActions } from '../../../store/socket-slice';
 
 interface 도전자 {
   SlaveUserCode: string;
@@ -21,8 +22,15 @@ interface 도전자 {
 }
 
 const VideoPage = () => {
+  const dispatch = useDispatch();
   const [masterWaiting, setMasterWaiting] = useState<boolean>(true);
   const mySocketId = useSelector((state: RootState) => state.socket.socketId);
+  const masterUserCode = useSelector(
+    (state: RootState) => state.socket.masterUserCode
+  );
+  const slaveUserCode = useSelector(
+    (state: RootState) => state.socket.slaveUserCode
+  );
   const [stream, setStream] = useState<MediaStream | null>(null);
   const myVideo = useRef<any>();
   const userVideo = useRef<any>();
@@ -32,7 +40,6 @@ const VideoPage = () => {
   const [receivingCall, setReceivingCall] = useState<any>(false);
   const [caller, setCaller] = useState<any>('');
   const [callerSignal, setCallerSignal] = useState<any>();
-  const [masterUserCode, setMasterUserCode] = useState<string>('');
   const navigate = useNavigate();
   const user = getStoredUser();
   const { openModal } = useModal();
@@ -43,6 +50,7 @@ const VideoPage = () => {
     if (도전자) {
       console.log('도전자 id', 도전자.SlaveSocketId, 도전자.SlaveUserCode);
       console.log('내 id', mySocketId);
+      dispatch(socketActions.setSlave(도전자.SlaveUserCode));
     }
     getMedia(myVideo, setStream);
 
@@ -50,29 +58,13 @@ const VideoPage = () => {
       setReceivingCall(true);
       setCaller(data.from);
       setCallerSignal(data.signal);
-      setMasterUserCode(data.userCode);
+      dispatch(socketActions.setMaster(data.userCode));
       console.log(data);
     });
 
     socket.on('callEnded', () => {
-      setCallEnded(true);
-      connectionRef.current.destroy();
-      navigate('/');
-      toast.info(
-        '상대방이 토론을 끝냈습니다. 상대의 방명록에 글을 남겨보세요.',
-        {
-          position: 'top-center',
-          ...basicToastOption,
-        }
-      );
-      openModal({
-        type: 'guestbook',
-        props: {
-          userCode: masterUserCode || 도전자.SlaveUserCode,
-          nickname: '방금 토론한 상대',
-        },
-      });
-      stopBothVideoAndAudio(stream);
+      console.log('상대가 끝냈습니다.');
+      navigate('/socket', { state: 'end' });
     });
   }, []);
 
@@ -103,6 +95,7 @@ const VideoPage = () => {
   };
 
   const answerCall = () => {
+    console.log('마스터', masterUserCode);
     setCallAccepted(true);
     const peer = new Peer({
       initiator: false,
@@ -121,7 +114,7 @@ const VideoPage = () => {
   };
 
   const leaveCall = () => {
-    console.log('내가끝냄', masterUserCode, 도전자);
+    console.log('내가끝냄', masterUserCode);
     socket.emit('end', {
       targetUserId: caller || 도전자.SlaveSocketId,
     });
