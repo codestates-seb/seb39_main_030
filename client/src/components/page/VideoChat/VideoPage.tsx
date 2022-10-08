@@ -64,11 +64,6 @@ const VideoPage = () => {
       setCallerSignal(data.signal);
       dispatch(socketActions.setMaster(data.userCode));
     });
-
-    socket.on('callEnded', () => {
-      endChat();
-      navigate('/socket', { state: 'end' });
-    });
   }, []);
 
   const callUser = (id: any) => {
@@ -93,7 +88,12 @@ const VideoPage = () => {
       setCallAccepted(true);
       peer.signal(signal);
     });
-
+    socket.on('callEnded', () => {
+      console.log('calluser 속');
+      endChat();
+      peer.close();
+      navigate('/socket', { state: 'end' });
+    });
     connectionRef.current = peer;
   };
 
@@ -112,6 +112,13 @@ const VideoPage = () => {
       userVideo.current.srcObject = stream;
     });
 
+    socket.on('callEnded', () => {
+      console.log('calluser 속');
+      //endChat();
+      navigate('/socket', { state: 'end' });
+      peer.close();
+    });
+
     peer.signal(callerSignal);
     connectionRef.current = peer;
   };
@@ -123,7 +130,7 @@ const VideoPage = () => {
     });
     setCallEnded(true);
     stopBothVideoAndAudio(stream);
-    //connectionRef.current.destroy();
+    connectionRef.current.destroy();
     navigate('/');
     toast.info('토론을 끝냈습니다. 상대방의 방명록에 글을 남겨보세요.', {
       position: 'top-center',
