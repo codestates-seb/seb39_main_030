@@ -33,7 +33,7 @@ const Logout = ({ onClose }) => {
   const logoutMutation = useMutation(logoutApi, {
     onSuccess: () => {
       queryClient.invalidateQueries(queryKeys.infiniteDebateList);
-      navigate('/socket', { state: 'logout' });
+      navigate('/socket', { state: { msg: 'logout' } });
     },
   });
   const logoutHandler = async () => {
