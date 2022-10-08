@@ -92,7 +92,7 @@ const VideoPage = () => {
     socket.on('callEnded', () => {
       console.log('calluser 속');
       //endChat();
-      connectionRef.current.destroy();
+      //connectionRef.current.destroy();
       navigate('/socket', { state: 'end' });
       peer.close();
     });
@@ -117,7 +117,7 @@ const VideoPage = () => {
     socket.on('callEnded', () => {
       console.log('callanswer 속');
       //endChat();
-      connectionRef.current.destroy();
+      //connectionRef.current.destroy();
       navigate('/socket', { state: 'end' });
       peer.close();
       endChat();
