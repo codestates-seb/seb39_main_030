@@ -46,6 +46,7 @@ const VideoPage = () => {
 
   const location = useLocation();
   const 도전자 = location.state as 도전자;
+
   useEffect(() => {
     if (도전자) {
       console.log('도전자 id', 도전자.SlaveSocketId, 도전자.SlaveUserCode);
@@ -63,7 +64,6 @@ const VideoPage = () => {
     });
 
     socket.on('callEnded', () => {
-      console.log('상대가 끝냈습니다.');
       navigate('/socket', { state: 'end' });
     });
   }, []);
@@ -119,7 +119,6 @@ const VideoPage = () => {
       targetUserId: caller || 도전자.SlaveSocketId,
     });
     setCallEnded(true);
-    connectionRef.current.destroy();
     navigate('/');
     toast.info('토론을 끝냈습니다. 상대방의 방명록에 글을 남겨보세요.', {
       position: 'top-center',
