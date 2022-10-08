@@ -64,11 +64,25 @@ const UpdateSocket = () => {
         });
         dispatch(socketActions.setSlave(''));
         dispatch(socketActions.setSocketId(''));
+        socket.on('me', (id) => {
+          console.log('소켓 갱신!', id);
+          dispatch(socketActions.setSocketId(id));
+          socket.emit('setUserCode', {
+            userCode: user.userCode,
+            socketId: id,
+          });
+          setStoredUser({ ...user, socketId: id });
+          updateSocketId({
+            userCode: Number(user.userCode),
+            socketId: id,
+          });
+        });
         navigate('/');
         break;
 
       default:
         socket.on('me', (id) => {
+          console.log('소켓 갱신!', id);
           dispatch(socketActions.setSocketId(id));
           socket.emit('setUserCode', {
             userCode: user.userCode,
