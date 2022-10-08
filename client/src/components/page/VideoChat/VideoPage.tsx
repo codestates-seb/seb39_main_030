@@ -64,11 +64,6 @@ const VideoPage = () => {
       setCallerSignal(data.signal);
       dispatch(socketActions.setMaster(data.userCode));
     });
-
-    socket.on('callEnded', () => {
-      endChat();
-      navigate('/socket', { state: 'end' });
-    });
   }, []);
 
   const callUser = (id: any) => {
@@ -93,7 +88,12 @@ const VideoPage = () => {
       setCallAccepted(true);
       peer.signal(signal);
     });
-
+    socket.on('callEnded', () => {
+      console.log('calluser 속');
+      endChat();
+      peer.close();
+      navigate('/socket', { state: 'end' });
+    });
     connectionRef.current = peer;
   };
 
@@ -110,6 +110,13 @@ const VideoPage = () => {
     });
     peer.on('stream', (stream) => {
       userVideo.current.srcObject = stream;
+    });
+
+    socket.on('callEnded', () => {
+      console.log('calluser 속');
+      //endChat();
+      navigate('/socket', { state: 'end' });
+      peer.close();
     });
 
     peer.signal(callerSignal);
