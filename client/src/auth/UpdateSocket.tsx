@@ -106,7 +106,7 @@ const UpdateSocket = () => {
         console.log('현재 나의 아이디는?', id);
       });
     }
-  }, [socketEndSignal]);
+  }, []);
 
   return (
     <div>

@@ -43,7 +43,7 @@ const VideoPage = () => {
   const 도전자 = location.state as 도전자;
   useEffect(() => {
     if (도전자) {
-      console.log('도전자 id', 도전자.SlaveSocketId);
+      console.log('도전자 id', 도전자.SlaveSocketId, 도전자.SlaveUserCode);
       console.log('내 id', mySocketId);
     }
     getMedia(myVideo, setStream);
@@ -56,9 +56,10 @@ const VideoPage = () => {
     });
 
     socket.on('callEnded', () => {
+      //dispatch(socketActions.endChat());
       setCallEnded(true);
-      stopBothVideoAndAudio(stream);
-      //connectionRef.current.destroy();
+      console.log('상대가 끝냈다.', masterUserCode);
+      connectionRef.current.destroy();
       navigate('/');
       toast.info(
         '상대방이 토론을 끝냈습니다. 상대의 방명록에 글을 남겨보세요.',
@@ -74,7 +75,7 @@ const VideoPage = () => {
           nickname: '방금 토론한 상대',
         },
       });
-      dispatch(socketActions.endChat());
+      stopBothVideoAndAudio(stream);
     });
   }, []);
 
@@ -127,7 +128,6 @@ const VideoPage = () => {
       targetUserId: caller || 도전자.SlaveSocketId,
     });
     setCallEnded(true);
-    stopBothVideoAndAudio(stream);
     //connectionRef.current.destroy();
     navigate('/');
     toast.info('토론을 끝냈습니다. 상대방의 방명록에 글을 남겨보세요.', {
@@ -141,6 +141,8 @@ const VideoPage = () => {
         nickname: '방금 토론한 상대',
       },
     });
+    stopBothVideoAndAudio(stream);
+    //dispatch(socketActions.endChat());
   };
 
   return (
