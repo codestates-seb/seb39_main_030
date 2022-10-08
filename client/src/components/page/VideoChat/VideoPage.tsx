@@ -8,13 +8,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Button from '../../atom/Button';
 import Loading from '../../app/Loading';
 import { socket } from '../../../auth/SingletonSocket';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { toast } from 'react-toastify';
 import { basicToastOption } from '../../app/Layout';
 import { getStoredUser } from '../../../auth/user-storage';
 import useModal from '../../app/hooks/useModal';
-import { socketActions } from '../../../store/socket-slice';
 
 interface 도전자 {
   SlaveUserCode: string;
@@ -52,6 +51,7 @@ const VideoPage = () => {
       setCaller(data.from);
       setCallerSignal(data.signal);
       setMasterUserCode(data.userCode);
+      console.log(data);
     });
 
     socket.on('callEnded', () => {
@@ -88,7 +88,7 @@ const VideoPage = () => {
         userToCall: id,
         signalData: data,
         from: mySocketId,
-        user: user.userCode,
+        userCode: user.userCode,
       });
     });
     peer.on('stream', (stream) => {
@@ -121,6 +121,7 @@ const VideoPage = () => {
   };
 
   const leaveCall = () => {
+    console.log('내가끝냄', masterUserCode, 도전자);
     socket.emit('end', {
       targetUserId: caller || 도전자.SlaveSocketId,
     });
