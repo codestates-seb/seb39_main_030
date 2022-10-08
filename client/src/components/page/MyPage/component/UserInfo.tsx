@@ -1,8 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Text } from '../../../atom/Text';
+import Button from '../../../atom/Button';
+import useModal from '../../../app/hooks/useModal';
+import { getStoredUser } from '../../../../auth/user-storage';
 
 export default function UserInfo(props: any) {
+  const { openModal } = useModal();
+  const user = getStoredUser();
+  const openGuestBook = () => {
+    openModal({
+      type: 'guestbook',
+      props: {
+        userCode: user.userCode,
+        nickname: props.nickname,
+      },
+    });
+  };
   return (
     <StyleUserInfo>
       <div className="user-info--top">
@@ -10,6 +24,9 @@ export default function UserInfo(props: any) {
         <Text>{props.nickname}</Text>
         <Text className="good">👍 {props.userLikes || 10}</Text>
       </div>
+      <Button onClick={openGuestBook} className="guestBtn">
+        내 방명록 보기
+      </Button>
       <div className="user-info--middle">
         <Text fontSize="lg" className="nickname">
           닉네임
@@ -38,6 +55,10 @@ const StyleUserInfo = styled.div`
   & .user-info--top {
     display: flex;
     align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  & .guestBtn {
     margin-bottom: 2rem;
   }
 

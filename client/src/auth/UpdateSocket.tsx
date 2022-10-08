@@ -21,11 +21,13 @@ const UpdateSocket = () => {
   const navigate = useNavigate();
   const state = location.state;
   const { openModal } = useModal();
+  const socketEndSignal = useSelector(
+    (state: RootState) => state.socket.endSignal
+  );
 
   useEffect(() => {
     switch (state) {
       case 'logout':
-        console.log(user?.userCode);
         socket.emit('forceDisconnect', { userCode: user?.userCode });
         updateSocketId({
           userCode: Number(user?.userCode),
@@ -54,6 +56,7 @@ const UpdateSocket = () => {
               socketId: id,
             });
             navigate('/');
+            console.log('현재 나의 아이디는?', id);
           });
         } else {
           socket.on('me', (id) => {
@@ -86,6 +89,24 @@ const UpdateSocket = () => {
       });
     });
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      socket.on('me', (id) => {
+        dispatch(socketActions.setSocketId(id));
+        setStoredUser({
+          ...user,
+          socketId: id,
+          temp: Number(user?.userCode) + 1,
+        });
+        socket.emit('setUserCode', {
+          userCode: Number(user?.userCode) + 1,
+          socketId: id,
+        });
+        console.log('현재 나의 아이디는?', id);
+      });
+    }
+  }, [socketEndSignal]);
 
   return (
     <div>

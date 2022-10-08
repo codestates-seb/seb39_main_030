@@ -11,16 +11,12 @@ import RouteList from './RouteList';
 import { ThemeProvider } from 'styled-components';
 import ModalPortal from '../block/Modal/ModalPortal';
 import { ToastContainer } from 'react-toastify';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 
 const App = () => {
   const theme = useCustomTheme();
   const mode = useSelector((state: RootState) => state.darkMode.mode) as string;
-  // useEffect(() => {
-  //   const user = getStoredUser();
-  //   setStoredUser({ ...user, userRole: 'ROLE_ADMIN' });
-  // }, []);
 
   return (
     <ThemeProvider theme={theme}>

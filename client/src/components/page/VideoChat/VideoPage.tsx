@@ -3,17 +3,18 @@ import React, { useEffect, useRef, useState } from 'react';
 import Peer from 'simple-peer';
 import { Text } from '../../atom/Text';
 import { media } from '../../../style/media';
-import { getMedia } from './util';
+import { getMedia, stopBothVideoAndAudio } from './util';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Button from '../../atom/Button';
 import Loading from '../../app/Loading';
 import { socket } from '../../../auth/SingletonSocket';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { toast } from 'react-toastify';
 import { basicToastOption } from '../../app/Layout';
 import { getStoredUser } from '../../../auth/user-storage';
 import useModal from '../../app/hooks/useModal';
+import { socketActions } from '../../../store/socket-slice';
 
 interface 도전자 {
   SlaveUserCode: string;
@@ -21,9 +22,10 @@ interface 도전자 {
 }
 
 const VideoPage = () => {
+  const dispatch = useDispatch();
   const [masterWaiting, setMasterWaiting] = useState<boolean>(true);
   const mySocketId = useSelector((state: RootState) => state.socket.socketId);
-  const [stream, setStream] = useState<any>();
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const myVideo = useRef<any>();
   const userVideo = useRef<any>();
   const connectionRef = useRef<any>();
@@ -44,15 +46,8 @@ const VideoPage = () => {
       console.log('도전자 id', 도전자.SlaveSocketId);
       console.log('내 id', mySocketId);
     }
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((stream) => {
-        setStream(stream);
-        if (myVideo.current) {
-          myVideo.current.srcObject = stream;
-          // console.log(myVideo.current);
-        }
-      });
+    getMedia(myVideo, setStream);
+
     socket.on('callUser', (data) => {
       setReceivingCall(true);
       setCaller(data.from);
@@ -62,7 +57,8 @@ const VideoPage = () => {
 
     socket.on('callEnded', () => {
       setCallEnded(true);
-      connectionRef.current.destroy();
+      stopBothVideoAndAudio(stream);
+      //connectionRef.current.destroy();
       navigate('/');
       toast.info(
         '상대방이 토론을 끝냈습니다. 상대의 방명록에 글을 남겨보세요.',
@@ -71,6 +67,14 @@ const VideoPage = () => {
           ...basicToastOption,
         }
       );
+      openModal({
+        type: 'guestbook',
+        props: {
+          userCode: 도전자.SlaveUserCode || masterUserCode,
+          nickname: '방금 토론한 상대',
+        },
+      });
+      dispatch(socketActions.endChat());
     });
   }, []);
 
@@ -123,18 +127,19 @@ const VideoPage = () => {
       targetUserId: caller || 도전자.SlaveSocketId,
     });
     setCallEnded(true);
-    connectionRef.current.destroy();
+    stopBothVideoAndAudio(stream);
+    //connectionRef.current.destroy();
     navigate('/');
-    openModal({
-      type: 'guestbook',
-      props: {
-        userCode: masterUserCode || user.userCode,
-        nickname: '방금 토론한 상대',
-      },
-    });
     toast.info('토론을 끝냈습니다. 상대방의 방명록에 글을 남겨보세요.', {
       position: 'top-center',
       ...basicToastOption,
+    });
+    openModal({
+      type: 'guestbook',
+      props: {
+        userCode: 도전자.SlaveUserCode || masterUserCode,
+        nickname: '방금 토론한 상대',
+      },
     });
   };
 
