@@ -60,6 +60,7 @@ const UpdateSocket = () => {
             nickname: '방금 토론한 상대',
           },
         });
+        navigate('/');
         break;
 
       default:
