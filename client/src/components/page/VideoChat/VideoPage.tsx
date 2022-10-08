@@ -123,7 +123,7 @@ const VideoPage = () => {
     });
     setCallEnded(true);
     stopBothVideoAndAudio(stream);
-    //connectionRef.current.destroy();
+    connectionRef.current.destroy();
     navigate('/');
     toast.info('토론을 끝냈습니다. 상대방의 방명록에 글을 남겨보세요.', {
       position: 'top-center',
