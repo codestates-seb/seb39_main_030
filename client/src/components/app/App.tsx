@@ -13,11 +13,32 @@ import ModalPortal from '../block/Modal/ModalPortal';
 import { ToastContainer } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
+import { socket } from '../../auth/SingletonSocket';
+import { socketActions } from '../../store/socket-slice';
+import { getStoredUser, setStoredUser } from '../../auth/user-storage';
 
 const App = () => {
   const theme = useCustomTheme();
   const mode = useSelector((state: RootState) => state.darkMode.mode) as string;
-
+  const user = getStoredUser();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (user) {
+      socket.on('me', (id) => {
+        dispatch(socketActions.setSocketId(id));
+        setStoredUser({
+          ...user,
+          socketId: id,
+          temp: Number(user?.userCode) + 1,
+        });
+        socket.emit('setUserCode', {
+          userCode: Number(user?.userCode) + 1,
+          socketId: id,
+        });
+        console.log('현재 나의 아이디는?', id);
+      });
+    }
+  }, []);
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyled />
