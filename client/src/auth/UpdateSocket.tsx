@@ -21,9 +21,6 @@ const UpdateSocket = () => {
   const navigate = useNavigate();
   const state = location.state;
   const { openModal } = useModal();
-  const socketEndSignal = useSelector(
-    (state: RootState) => state.socket.endSignal
-  );
 
   useEffect(() => {
     switch (state) {
@@ -43,42 +40,25 @@ const UpdateSocket = () => {
         break;
 
       default:
-        if (user?.socketId) {
-          socket.on('me', (id) => {
-            dispatch(socketActions.setSocketId(id));
-            setStoredUser({
-              ...user,
-              socketId: id,
-              temp: Number(user?.userCode) + 1,
-            });
-            socket.emit('setUserCode', {
-              userCode: Number(user?.userCode) + 1,
-              socketId: id,
-            });
-            navigate('/');
-            console.log('현재 나의 아이디는?', id);
+        socket.on('me', (id) => {
+          dispatch(socketActions.setSocketId(id));
+          socket.emit('setUserCode', {
+            userCode: user.userCode,
+            socketId: id,
           });
-        } else {
-          socket.on('me', (id) => {
-            dispatch(socketActions.setSocketId(id));
-            socket.emit('setUserCode', {
-              userCode: user.userCode,
-              socketId: id,
-            });
-            setStoredUser({ ...user, socketId: id });
-            updateSocketId({
-              userCode: Number(user.userCode),
-              socketId: id,
-            });
+          setStoredUser({ ...user, socketId: id });
+          updateSocketId({
+            userCode: Number(user.userCode),
+            socketId: id,
           });
-        }
+        });
         break;
     }
   }, []);
 
   useEffect(() => {
     socket.on('receiveFight', (data) => {
-      dispatch(signal(true));
+      //dispatch(signal(true));
       toast.info('토론 신청이 왔습니다!.', {
         position: 'top-center',
         ...basicToastOption,
@@ -88,24 +68,6 @@ const UpdateSocket = () => {
         props: { fightUser: data },
       });
     });
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      socket.on('me', (id) => {
-        dispatch(socketActions.setSocketId(id));
-        setStoredUser({
-          ...user,
-          socketId: id,
-          temp: Number(user?.userCode) + 1,
-        });
-        socket.emit('setUserCode', {
-          userCode: Number(user?.userCode) + 1,
-          socketId: id,
-        });
-        console.log('현재 나의 아이디는?', id);
-      });
-    }
   }, []);
 
   return (

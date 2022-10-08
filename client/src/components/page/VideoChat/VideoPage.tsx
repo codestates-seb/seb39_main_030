@@ -22,7 +22,6 @@ interface 도전자 {
 }
 
 const VideoPage = () => {
-  const dispatch = useDispatch();
   const [masterWaiting, setMasterWaiting] = useState<boolean>(true);
   const mySocketId = useSelector((state: RootState) => state.socket.socketId);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -56,9 +55,7 @@ const VideoPage = () => {
     });
 
     socket.on('callEnded', () => {
-      //dispatch(socketActions.endChat());
       setCallEnded(true);
-      console.log('상대가 끝냈다.', masterUserCode);
       connectionRef.current.destroy();
       navigate('/');
       toast.info(
@@ -128,7 +125,7 @@ const VideoPage = () => {
       targetUserId: caller || 도전자.SlaveSocketId,
     });
     setCallEnded(true);
-    //connectionRef.current.destroy();
+    connectionRef.current.destroy();
     navigate('/');
     toast.info('토론을 끝냈습니다. 상대방의 방명록에 글을 남겨보세요.', {
       position: 'top-center',
@@ -142,7 +139,6 @@ const VideoPage = () => {
       },
     });
     stopBothVideoAndAudio(stream);
-    //dispatch(socketActions.endChat());
   };
 
   return (
