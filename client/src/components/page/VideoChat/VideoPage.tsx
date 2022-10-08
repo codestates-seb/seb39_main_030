@@ -28,9 +28,7 @@ const VideoPage = () => {
   const masterUserCode = useSelector(
     (state: RootState) => state.socket.masterUserCode
   );
-  const slaveUserCode = useSelector(
-    (state: RootState) => state.socket.slaveUserCode
-  );
+
   const [stream, setStream] = useState<MediaStream | null>(null);
   const myVideo = useRef<any>();
   const userVideo = useRef<any>();
@@ -42,41 +40,34 @@ const VideoPage = () => {
   const [callerSignal, setCallerSignal] = useState<any>();
   const navigate = useNavigate();
   const user = getStoredUser();
+  const { openModal } = useModal();
 
   const location = useLocation();
   const 도전자 = location.state as 도전자;
 
   const endChat = () => {
-    connectionRef.current.destroy();
     setCallEnded(true);
-    console.log(stream, '스트림');
-    navigate('/socket', { state: { msg: 'end', other: stream } });
+    connectionRef.current.destroy();
   };
+
   useEffect(() => {
     if (도전자) {
       console.log('도전자 id', 도전자.SlaveSocketId, 도전자.SlaveUserCode);
       console.log('내 id', mySocketId);
       dispatch(socketActions.setSlave(도전자.SlaveUserCode));
     }
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((stream) => {
-        setStream(stream);
-        if (myVideo.current) {
-          myVideo.current.srcObject = stream;
-        }
-      });
+    getMedia(myVideo, setStream);
 
     socket.on('callUser', (data) => {
       setReceivingCall(true);
       setCaller(data.from);
       setCallerSignal(data.signal);
       dispatch(socketActions.setMaster(data.userCode));
-      console.log(data);
     });
 
     socket.on('callEnded', () => {
-      return endChat();
+      endChat();
+      navigate('/socket', { state: 'end' });
     });
   }, []);
 
@@ -131,9 +122,20 @@ const VideoPage = () => {
       targetUserId: caller || 도전자.SlaveSocketId,
     });
     setCallEnded(true);
-    connectionRef.current.destroy();
-    navigate('/socket', { state: 'end' });
     stopBothVideoAndAudio(stream);
+    //connectionRef.current.destroy();
+    navigate('/');
+    toast.info('토론을 끝냈습니다. 상대방의 방명록에 글을 남겨보세요.', {
+      position: 'top-center',
+      ...basicToastOption,
+    });
+    openModal({
+      type: 'guestbook',
+      props: {
+        userCode: masterUserCode || 도전자.SlaveUserCode,
+        nickname: '방금 토론한 상대',
+      },
+    });
   };
 
   return (
