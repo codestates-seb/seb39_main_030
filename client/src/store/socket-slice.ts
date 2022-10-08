@@ -5,6 +5,8 @@ const socketSlice = createSlice({
   initialState: {
     socketId: '',
     endSignal: false,
+    masterUserCode: '',
+    slaveUserCode: '',
   },
   reducers: {
     setSocketId: (state, action) => {
@@ -12,6 +14,12 @@ const socketSlice = createSlice({
     },
     endChat: (state) => {
       state.endSignal = !state.endSignal;
+    },
+    setMaster: (state, action) => {
+      state.masterUserCode = action.payload;
+    },
+    setSlave: (state, action) => {
+      state.masterUserCode = action.payload;
     },
   },
 });

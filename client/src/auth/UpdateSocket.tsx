@@ -20,9 +20,16 @@ const UpdateSocket = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state;
+  const masterUserCode = useSelector(
+    (state: RootState) => state.socket.masterUserCode
+  );
+  const slaveUserCode = useSelector(
+    (state: RootState) => state.socket.slaveUserCode
+  );
   const { openModal } = useModal();
 
   useEffect(() => {
+    console.log(state);
     switch (state) {
       case 'logout':
         socket.emit('forceDisconnect', { userCode: user?.userCode });
@@ -36,6 +43,27 @@ const UpdateSocket = () => {
           position: 'top-center',
           ...basicToastOption,
         });
+        navigate('/');
+        break;
+
+      case 'end':
+        console.log('상대가 끝냈습니다.', slaveUserCode, masterUserCode);
+        toast.info(
+          '상대방이 토론을 끝냈습니다. 상대의 방명록에 글을 남겨보세요.',
+          {
+            position: 'top-center',
+            ...basicToastOption,
+          }
+        );
+        openModal({
+          type: 'guestbook',
+          props: {
+            userCode: masterUserCode || slaveUserCode,
+            nickname: '방금 토론한 상대',
+          },
+        });
+        dispatch(socketActions.setSlave(''));
+        dispatch(socketActions.setSocketId(''));
         navigate('/');
         break;
 
