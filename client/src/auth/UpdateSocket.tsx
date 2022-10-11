@@ -46,13 +46,10 @@ const UpdateSocket = () => {
         break;
 
       case 'end':
-        toast.info(
-          '상대방이 토론을 끝냈습니다. 상대의 방명록에 글을 남겨보세요.',
-          {
-            position: 'top-center',
-            ...basicToastOption,
-          }
-        );
+        toast.info('토론이 끝났습니다. 상대의 방명록에 글을 남겨보세요.', {
+          position: 'top-center',
+          ...basicToastOption,
+        });
         openModal({
           type: 'guestbook',
           props: {
