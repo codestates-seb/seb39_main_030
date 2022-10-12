@@ -19,6 +19,7 @@ import RdeleteModal from '../../page/Admin/Report/RdeleteModal';
 import SaveModal from '../../page/MyPage/component/SaveModal';
 import LeaveModal from '../../page/MyPage/component/LeaveModal';
 import FightModal from '../../page/VideoChat/FightModal';
+import InfoModal from '../../page/Lending/InfoModal';
 
 const MODAL_COMPONENTS = {
   simple: SimpleModal,
@@ -37,6 +38,7 @@ const MODAL_COMPONENTS = {
   SaveModal: SaveModal,
   LeaveModal: LeaveModal,
   fightModal: FightModal,
+  infoModal: InfoModal,
 };
 
 const ModalPortal = () => {

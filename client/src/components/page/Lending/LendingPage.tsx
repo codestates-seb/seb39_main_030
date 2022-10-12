@@ -8,12 +8,19 @@ import { media } from '../../../style/media';
 import Toggle from '../../atom/Toggle';
 import { useDispatch } from 'react-redux';
 import { toggleActions } from '../../../store/debateToggle-slice';
-
+import InfoModal from './InfoModal';
+import Button from '../../atom/Button';
+import useModal from '../../app/hooks/useModal';
 const LendingPage = () => {
+  const { openModal } = useModal();
   const dispatch = useDispatch();
 
   const toggleHandler = (state) => {
     dispatch(toggleActions.setToggle(state));
+  };
+
+  const infoModal = () => {
+    openModal({ type: 'infoModal' });
   };
 
   return (
@@ -22,6 +29,7 @@ const LendingPage = () => {
         <Item />
       </SlickContainer>
       <TagTab />
+      <Button onClick={infoModal}>📌 데모데이 안내 모달창</Button>
       <div className="label">
         <Text className="label-debate" fontSize="xl" fontWeight="semiBold">
           토론 목록
