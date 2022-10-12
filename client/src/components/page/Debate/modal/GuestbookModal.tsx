@@ -26,7 +26,7 @@ const GuestbookModal = ({ onClose, userCode, nickname }) => {
   const getUserInfo = async () => {
     const params = { userCode };
     const { data } = await axiosInstance.get('/user/myInfo', { params });
-    data.tag && setTag(tagFilter(Object.values(data.tags)).toString());
+    data.tags && setTag(tagFilter(Object.values(data.tags)).toString());
   };
 
   const modifyControlHandler = (idx) => {
