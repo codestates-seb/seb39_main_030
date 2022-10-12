@@ -161,7 +161,13 @@ const VideoPage = () => {
       </div>
       <VideoContainer>
         <div className="video">
-          <video playsInline style={{ width: '100%' }} ref={myVideo} autoPlay />
+          <video
+            muted
+            playsInline
+            style={{ width: '100%' }}
+            ref={myVideo}
+            autoPlay
+          />
         </div>
         <div className="video">
           {callAccepted && !callEnded ? (
